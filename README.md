@@ -5,7 +5,7 @@ This is the new version of the previous repository (had to remake, some issues)
 ### Functionality to implement:
 
 - [ ] Access spreadsheet
-- [ ] Make new sheets given band name
+- [ ] Generate new sheets when band name added to list
 - [ ] Trigger python scripts when specific cells update
     - [ ] Create new sheet for artist entered on List of Artists sheet
     - [ ] Bold + color change highest rated song on album
@@ -24,3 +24,5 @@ This is the new version of the previous repository (had to remake, some issues)
     - [ ] Album release years
     - [ ] Get album cover pictures
     - [ ] Make an album class / object / map? (map album title to list of songs, picture, etc)
+- [ ] Create Playlists based on song ratings
+    - [ ] 8+ songs go in playlist, etc.
