@@ -2,6 +2,8 @@ import gspread
 
 from google.oauth2.service_account import Credentials
 
+# command for running venv: .\music_ratings\Scripts\activate.ps1
+
 # authorizing code to edit my spreadsheets with credentials (hidden)
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
 creds = Credentials.from_service_account_file("credentials.json", scopes = scopes)
