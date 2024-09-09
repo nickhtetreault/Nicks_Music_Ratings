@@ -49,6 +49,7 @@ class ArtistData:
         if len(json_result) == 0:
             print("No artist found with this name")
             return None
+        
         self.artist_id = json_result[0]["id"]
 
         # calling get_albums, breaking up the functions so I don't have to put everything in init
@@ -63,34 +64,30 @@ class ArtistData:
         # parsing json content to make data easier to access
         album_data = json.loads(result.content)
 
-        # might get rid of album titles later (redundant with Album objects)
-        album_titles = []
         album_objects = []
-
-        # \/\/\/ test variable \/\/\/
-        # album_ids = []
         
         # creating Album objects with album id's
-        for a in album_data["items"]:
-            # album_ids.append(a["id"])
-            album_titles.append(a["name"])
-            album = Album(token, a["id"], album_data)
+        for i in range(len(album_data["items"])):
+            album = Album(token, album_data, i)
             album_objects.append(album)
-        self.album_titles = album_titles
+
+        # self.album_titles = album_titles
         self.album_objects = album_objects
 
-        # test var
-        # self.album_ids = album_ids
 
 # object containing all data from an album from spotify
 # also has variables that will be updated by input in spreadsheet
 class Album:
-    def __init__(self, token, album_id, album_data):
+    def __init__(self, token, album_data, album_num):
         self.token = token
-        self.album_id = album_id
         self.album_data = album_data
 
-        # calling get_songs() to break up the class
+        # deriving vars from album_data
+        self.album_id = album_data["items"][album_num]["id"]
+        self.album_title = album_data["items"][album_num]["name"]
+        self.release_date = album_data["items"][album_num]["release_date"][0:4]
+        self.cover = album_data["items"][album_num]["images"][0]["url"]
+
         self.get_song_data()
 
     def get_song_data(self):
@@ -104,50 +101,50 @@ class Album:
         self.song_data = song_data
 
         # adding song titles to song list
+        # might convert to a map later (song_title -> song_rating)
         song_titles = []
+        # probably won't need ids for now
+        # might be useful for later implementations
+        song_ids = []
+        song_lengths = []
         # print(song_data)
         for s in song_data["items"]:
             song_titles.append(s["name"])
+            song_ids.append(s["id"])
+            song_lengths.append(self.millis_to_mins(s["duration_ms"]))
+        
         self.song_titles = song_titles
+        self.song_ids = song_ids
+        self.song_lengths = song_lengths
 
-
-def search_for_artist(token, artist_name):
-    url = "https://api.spotify.com/v1/search"
-    headers = get_auth_header(token)
-    query = f"?q={artist_name}&type=artist&limit=1"
-    query_url = url + query
-
-    result = get(query_url, headers=headers)
-    json_result = json.loads(result.content)["artists"]["items"]
-    if len(json_result) == 0:
-        print("No artist found with this name")
-        return None
-
-    return json_result[0]
-
-def get_albums(token, artist_id):
-    url = f"https://api.spotify.com/v1/artists/{artist_id}/albums?include_groups=album&market=US&limit=50"
-    headers = get_auth_header(token)
-    result = get(url, headers=headers)
-    json_result = json.loads(result.content)
-    return json_result
-
-def get_songs(token, album_id):
-    url = "https://api.spotify.com/v1/albums/2bVYeA0BEb0Rtj94ECaahK/tracks?market=US&limit=50&offset=0"
-    headers = get_auth_header(token)
-    result = get(url, headers=headers)
-    json_result = json.loads(result.content)
-    return json_result
+    # converting song lengths to more readable mins:seconds (ex. 4:23, 2:06, 10:04, etc.)
+    def millis_to_mins(self, millis):
+        # if song is shorter than one hour (99.999999% of cases)
+        if (millis < 3600000):
+            seconds = int(millis/1000)%60
+            minutes = int(millis/(1000*60))%60
+            if (seconds < 10):
+                seconds = "0" + str(seconds)
+            return f"{minutes}:{seconds}"
+        else:
+            seconds = int(millis/1000)%60
+            minutes = int(millis/(1000*60))%60
+            hours = int(millis/(1000*60*60))%24
+            if (seconds < 10):
+                seconds = "0" + str(seconds)
+            if (minutes < 10):
+                minutes = "0" + str(minutes)
+            return f"{minutes}:{seconds}:{hours}"
 
 token = get_token()
 
-opeth = ArtistData(token, "Opeth")
+artist = ArtistData(token, "SZA")
 
-# print(opeth.album_ids)
-# for id in opeth.album_ids:
-#     print(id)
+print(artist.album_objects[4].album_title)
 
-for s in opeth.album_objects[13].song_titles:
-    print(s)
+print(artist.album_objects[4].release_date)
 
-# print(opeth.album_objects[13].song_data)
+print(artist.album_objects[4].cover)
+
+for i in range(len(artist.album_objects[5].song_titles)):
+    print(artist.album_objects[4].song_titles[i] + " " + artist.album_objects[4].song_lengths[i])
