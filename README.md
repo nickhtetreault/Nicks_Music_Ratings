@@ -1,6 +1,10 @@
 # Spotify-API-Test
 
-This is the new version of the previous repository (had to remake, some issues)
+Inspiration for spreadsheet [here](https://docs.google.com/spreadsheets/d/1xHZ8XMuCCnNd88tfcPiWxfFuq6EHfB9t3V-EMD7jm6M/edit?usp=sharing)
+
+Spreadsheet maintained by the code in this repository [here](https://docs.google.com/spreadsheets/d/1Jc7roe2tmtVx-0hdn6DPI2zDh6NcPyWLBMVZN20a5WM/edit?usp=sharing)
+
+I know the spreadsheet doesn't look too impressive yet, but I'm close to implementing a lot of that functionality
 
 ### Functionality to implement:
 
@@ -18,11 +22,12 @@ This is the new version of the previous repository (had to remake, some issues)
     - [ ] AI model to recommend me music based on rankings?
 - [x] Access spotify api
 - [x] Get band data
-    - [x] List of album titles (find way to filter only albums, no live releases)
+    - [x] List of album titles
+        - [ ] Filter out live albums and repeat releases
     - [x] List of songs for each album
-    - [ ] Song lengths
-    - [ ] Album release years
-    - [ ] Get album cover pictures
+    - [x] Song lengths
+    - [x] Album release years
+    - [x] Get album cover pictures
     - [x] Make an Artist class
     - [x] Make an Album class
 - [ ] Create Playlists based on song ratings
