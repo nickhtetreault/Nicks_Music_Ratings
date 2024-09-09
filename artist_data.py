@@ -30,33 +30,85 @@ def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
 
 # object containing all data to be put into spreadsheet
+# also has variables that will be updated by input in spreadsheet
 class ArtistData:
     def __init__(self, token, artist_name):
         self.token = token
         self.artist_name = artist_name
 
-        # finding artist_id
+        # structuring request & finding artist_id
         url = "https://api.spotify.com/v1/search"
         headers = get_auth_header(token)
         query = f"?q={artist_name}&type=artist&limit=1"
         query_url = url + query
-
         result = get(query_url, headers=headers)
+        # parsing json content to make data easier to accest
         json_result = json.loads(result.content)["artists"]["items"]
+
+        # checking that artist with given name exists
         if len(json_result) == 0:
             print("No artist found with this name")
             return None
-        else:
-            self.artist_id = json_result[0]["id"]
+        self.artist_id = json_result[0]["id"]
 
+        # calling get_albums, breaking up the functions so I don't have to put everything in init
+        self.get_albums()
+    
+    def get_albums(self):
+        # structuring request
+        url = f"https://api.spotify.com/v1/artists/{self.artist_id}/albums?include_groups=album&market=US&limit=50"
+        headers = get_auth_header(token)
+        result = get(url, headers=headers)
+
+        # parsing json content to make data easier to access
+        album_data = json.loads(result.content)
+
+        # might get rid of album titles later (redundant with Album objects)
+        album_titles = []
+        album_objects = []
+
+        # \/\/\/ test variable \/\/\/
+        # album_ids = []
+        
+        # creating Album objects with album id's
+        for a in album_data["items"]:
+            # album_ids.append(a["id"])
+            album_titles.append(a["name"])
+            album = Album(token, a["id"], album_data)
+            album_objects.append(album)
+        self.album_titles = album_titles
+        self.album_objects = album_objects
+
+        # test var
+        # self.album_ids = album_ids
+
+# object containing all data from an album from spotify
+# also has variables that will be updated by input in spreadsheet
 class Album:
-    def __init__(self, token, album_id):
+    def __init__(self, token, album_id, album_data):
         self.token = token
         self.album_id = album_id
+        self.album_data = album_data
 
-    # def setAlbumData(self):
+        # calling get_songs() to break up the class
+        self.get_song_data()
 
+    def get_song_data(self):
+        # structuring request
+        url = f"https://api.spotify.com/v1/albums/{self.album_id}/tracks?market=US&limit=50&offset=0"
+        headers = get_auth_header(token)
+        result = get(url, headers=headers)
 
+        # parsing json content again
+        song_data = json.loads(result.content)
+        self.song_data = song_data
+
+        # adding song titles to song list
+        song_titles = []
+        # print(song_data)
+        for s in song_data["items"]:
+            song_titles.append(s["name"])
+        self.song_titles = song_titles
 
 
 def search_for_artist(token, artist_name):
@@ -80,7 +132,6 @@ def get_albums(token, artist_id):
     json_result = json.loads(result.content)
     return json_result
 
-
 def get_songs(token, album_id):
     url = "https://api.spotify.com/v1/albums/2bVYeA0BEb0Rtj94ECaahK/tracks?market=US&limit=50&offset=0"
     headers = get_auth_header(token)
@@ -90,19 +141,13 @@ def get_songs(token, album_id):
 
 token = get_token()
 
-result = search_for_artist(token, "Opeth")
+opeth = ArtistData(token, "Opeth")
 
-# print(result)
+# print(opeth.album_ids)
+# for id in opeth.album_ids:
+#     print(id)
 
-artist_id = result["id"]
+for s in opeth.album_objects[13].song_titles:
+    print(s)
 
-albums = get_albums(token, artist_id)
-
-# for i in range(len(albums["items"])):
-    # print(albums["items"][i]["id"])
-print(get_songs(token, albums["items"][15]["id"])["items"][0]["name"])
-
-# print(len(albums["items"]))
-
-# print(result["name"])
-# print(artist_id)
+# print(opeth.album_objects[13].song_data)
