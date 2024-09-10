@@ -101,21 +101,24 @@ class Album:
         self.song_data = song_data
 
         # adding song titles to song list
-        # might convert to a map later (song_title -> song_rating)
         song_titles = []
         # probably won't need ids for now
         # might be useful for later implementations
+        # might convert to a map later (song_title -> song_rating)
         song_ids = []
-        song_lengths = []
+        song_lens = []
+        album_len = 0
         # print(song_data)
         for s in song_data["items"]:
             song_titles.append(s["name"])
             song_ids.append(s["id"])
-            song_lengths.append(self.millis_to_mins(s["duration_ms"]))
+            song_lens.append(self.millis_to_mins(s["duration_ms"]))
+            album_len += s["duration_ms"]
         
         self.song_titles = song_titles
         self.song_ids = song_ids
-        self.song_lengths = song_lengths
+        self.song_lens = song_lens
+        self.album_len = self.millis_to_mins(album_len)
 
     # converting song lengths to more readable mins:seconds (ex. 4:23, 2:06, 10:04, etc.)
     def millis_to_mins(self, millis):
@@ -138,13 +141,15 @@ class Album:
 
 token = get_token()
 
-artist = ArtistData(token, "SZA")
+artist = ArtistData(token, "Opeth")
 
-print(artist.album_objects[4].album_title)
+print(artist.album_objects[18].album_title)
 
-print(artist.album_objects[4].release_date)
+print(artist.album_objects[18].release_date)
 
-print(artist.album_objects[4].cover)
+print(artist.album_objects[18].album_len)
+
+print(artist.album_objects[18].cover)
 
 for i in range(len(artist.album_objects[5].song_titles)):
-    print(artist.album_objects[4].song_titles[i] + " " + artist.album_objects[4].song_lengths[i])
+    print(artist.album_objects[18].song_titles[i] + " " + artist.album_objects[18].song_lens[i])
