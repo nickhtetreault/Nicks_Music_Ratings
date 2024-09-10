@@ -1,4 +1,7 @@
 Credentials.json
 
+# venv
+music_ratings/
+
 # Environments
 .env
