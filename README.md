@@ -1,4 +1,4 @@
-# Spotify-API-Test
+# Nick's Music Ratings
 
 Inspiration for spreadsheet [here](https://docs.google.com/spreadsheets/d/1xHZ8XMuCCnNd88tfcPiWxfFuq6EHfB9t3V-EMD7jm6M/edit?usp=sharing)
 
