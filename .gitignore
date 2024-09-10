@@ -1,7 +1,6 @@
 Credentials.json
 
-# venv
-music_ratings/
+venv/
 
-# Environments
+# Environment
 .env
