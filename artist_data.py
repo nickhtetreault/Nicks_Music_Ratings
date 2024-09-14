@@ -31,7 +31,7 @@ def get_auth_header(token):
 
 # object containing all data to be put into spreadsheet
 # also has variables that will be updated by input in spreadsheet
-class ArtistData:
+class Artist:
     def __init__(self, token, artist_name):
         self.token = token
         self.artist_name = artist_name
@@ -139,17 +139,19 @@ class Album:
                 minutes = "0" + str(minutes)
             return f"{minutes}:{seconds}:{hours}"
 
+# \/\/\/ Testing \/\/\/
+
 token = get_token()
 
-artist = ArtistData(token, "Opeth")
+# artist = Artist(token, "Opeth")
 
-print(artist.album_objects[18].album_title)
+# print(artist.album_objects[18].album_title)
 
-print(artist.album_objects[18].release_date)
+# print(artist.album_objects[18].release_date)
 
-print(artist.album_objects[18].album_len)
+# print(artist.album_objects[18].album_len)
 
-print(artist.album_objects[18].cover)
+# print(artist.album_objects[18].cover)
 
-for i in range(len(artist.album_objects[5].song_titles)):
-    print(artist.album_objects[18].song_titles[i] + " " + artist.album_objects[18].song_lens[i])
+# for i in range(len(artist.album_objects[18].song_titles)):
+#     print(artist.album_objects[18].song_titles[i] + " " + artist.album_objects[18].song_lens[i])
