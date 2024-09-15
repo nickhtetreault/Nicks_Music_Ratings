@@ -44,11 +44,11 @@ artist = Artist(token, "Opeth")
 worksheet = sh.worksheet(artist.artist_name)
 
 # Inserting files based on position relative to other album lengths
-def format_album(range, alb):
-  return 1
+# def format_album(range, alb):
+#   return 1
 
-for alb in artist.album_objects:
-  format_album("A1B2", alb)
+# for alb in artist.album_objects:
+#   format_album("A1B2", alb)
 
 
 #                   Formatting non-album sections
@@ -148,7 +148,7 @@ for i in range (len(artist.album_objects)):
   worksheet.update_acell(f"Q{6 + i}", i + 1)
   worksheet.merge_cells(f"R{6 + i}:T{6 + i}")
 
-time.sleep(60)
+time.sleep(100)
 
 # Formatting song rankings
 
