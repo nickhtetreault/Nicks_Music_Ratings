@@ -9,6 +9,8 @@ I know the spreadsheet doesn't look too impressive yet, but I'm close to impleme
 ### Functionality to implement:
 
 - [x] Access spreadsheet
+- [ ] Format artist albums
+- [x] Format arist non-album section
 - [ ] Generate new sheets when band name added to list
 - [ ] Trigger python scripts when specific cells update
     - [ ] Create new sheet for artist entered on List of Artists sheet
