@@ -6,6 +6,18 @@ from google.oauth2.service_account import Credentials
 from artist_data import Artist, Album
 from artist_data import *
 
+Colors = {
+    "bg": [207 / 255.0, 226 / 255.0, 243 / 255.0],
+    "Gray_1": [183 / 255.0, 183 / 255.0, 183 / 255.0],
+    "Gray_2": [204 / 255.0, 204 / 255.0, 204 / 255.0],
+    "Gray_3": [217 / 255.0, 217 / 255.0, 217 / 255.0],
+    "Purple_1": [103 / 255.0, 78 / 255.0, 167 / 255.0],
+    "Purple_2": [142 / 255.0, 124 / 255.0, 195 / 255.0],
+    "Purple_3": [180 / 255.0, 167 / 255.0, 214 / 255.0],
+    "Blue": [61 / 255.0, 133 / 255.0, 198 / 255.0],
+    "Black": [0, 0, 0]
+}
+
 # Exponential backoff retry function
 def exponential_backoff(func, *args, max_retries=8, **kwargs):
     retries = 0
@@ -22,6 +34,137 @@ def exponential_backoff(func, *args, max_retries=8, **kwargs):
     
     raise Exception("Maximum retries exceeded")
 
+def format_album(worksheet, alb, pos, i):
+    # Album number
+    exponential_backoff(worksheet.format, f"C{pos}:C{pos + 1}", {
+    "backgroundColor": {
+        "red": Colors["Gray_1"][0],
+        "green": Colors["Gray_1"][1],
+        "blue": Colors["Gray_1"][2]
+    },
+    "horizontalAlignment": "CENTER",
+    "verticalAlignment": "MIDDLE",
+    "textFormat": {
+        "foregroundColor": {
+            "red": Colors["Purple_1"][0],
+            "green": Colors["Purple_1"][1],
+            "blue": Colors["Purple_1"][2]
+        },
+        "fontFamily": "Roboto Serif",
+        "fontSize": 25,
+        "bold": True
+        }    
+    })
+    exponential_backoff(worksheet.merge_cells, f"C{pos}:C{pos + 1}")
+    exponential_backoff(worksheet.update_acell, f"C{pos}", i + 1)
+    
+    # Album release year
+    exponential_backoff(worksheet.format, f"D{pos}:D{pos + 1}", {
+    "backgroundColor": {
+        "red": Colors["Gray_2"][0],
+        "green": Colors["Gray_2"][1],
+        "blue": Colors["Gray_2"][2]
+    },
+    "horizontalAlignment": "CENTER",
+    "verticalAlignment": "MIDDLE",
+    "textFormat": {
+        "foregroundColor": {
+            "red": Colors["Blue"][0],
+            "green": Colors["Blue"][1],
+            "blue": Colors["Blue"][2]
+        },
+        "fontFamily": "Roboto Serif",
+        "fontSize": 25,
+        "bold": True
+        }    
+    })
+    exponential_backoff(worksheet.merge_cells, f"D{pos}:D{pos + 1}")
+    exponential_backoff(worksheet.update_acell, f"D{pos}", alb.release_date)
+
+    # Album title
+    exponential_backoff(worksheet.format, f"E{pos}:K{pos + 1}", {
+    "backgroundColor": {
+        "red": Colors["Gray_3"][0],
+        "green": Colors["Gray_3"][1],
+        "blue": Colors["Gray_3"][2]
+    },
+    "horizontalAlignment": "CENTER",
+    "verticalAlignment": "MIDDLE",
+    "textFormat": {
+        "foregroundColor": {
+            "red": Colors["Purple_2"][0],
+            "green": Colors["Purple_2"][1],
+            "blue": Colors["Purple_2"][2]
+        },
+        "fontFamily": "Roboto Serif",
+        "fontSize": 25,
+        "bold": True
+        }    
+    })
+    exponential_backoff(worksheet.merge_cells, f"E{pos}:K{pos + 1}")
+    exponential_backoff(worksheet.update_acell, f"E{pos}", alb.album_title)
+
+    # Album rating
+
+    exponential_backoff(worksheet.format, f"M{pos}:N{pos + 1}", {
+    "backgroundColor": {
+        "red": Colors["Gray_3"][0],
+        "green": Colors["Gray_3"][1],
+        "blue": Colors["Gray_3"][2]
+    },
+    "horizontalAlignment": "CENTER",
+    "verticalAlignment": "MIDDLE",
+    "textFormat": {
+        "foregroundColor": {
+            "red": Colors["Purple_2"][0],
+            "green": Colors["Purple_2"][1],
+            "blue": Colors["Purple_2"][2]
+        },
+        "fontFamily": "Roboto Serif",
+        "fontSize": 25,
+        "bold": True
+        }    
+    })
+    exponential_backoff(worksheet.merge_cells, f"M{pos}:N{pos + 1}")
+    exponential_backoff(worksheet.update_acell, f"M{pos}", "Rating")
+
+    # Rating input
+    exponential_backoff(worksheet.format, f"M{pos + 2}:N{pos + 3}", {
+    "horizontalAlignment": "CENTER",
+    "verticalAlignment": "MIDDLE",
+    "textFormat": {
+        "fontFamily": "Roboto Serif",
+        "fontSize": 20,
+        "bold": True
+        }    
+    })
+    exponential_backoff(worksheet.merge_cells, f"M{pos + 2}:N{pos + 3}")
+
+    # Labels (song number, track title, length, rating)
+    exponential_backoff(worksheet.format, f"E{pos + 2}:K{pos + 2}", {
+    "horizontalAlignment": "CENTER",
+    "verticalAlignment": "MIDDLE",
+    "textFormat": {
+        "foregroundColor": {
+            "red": Colors["Purple_3"][0],
+            "green": Colors["Purple_3"][1],
+            "blue": Colors["Purple_3"][2]
+        },
+        "fontFamily": "Roboto Serif",
+        "fontSize": 10,
+        "bold": True
+        }    
+    })
+    exponential_backoff(worksheet.merge_cells, f"F{pos + 2}:I{pos + 2}")
+    exponential_backoff(worksheet.update_acell, f"E{pos + 2}", "#")   
+    exponential_backoff(worksheet.update_acell, f"F{pos + 2}", "Song")
+    exponential_backoff(worksheet.update_acell, f"J{pos + 2}", "Length")
+    exponential_backoff(worksheet.update_acell, f"K{pos + 2}", "Rating")
+
+    # Formatting songs
+    # for i in range(len(alb.song_titles)):
+    #     print
+
 # For my own reference lol \/\/\/
 # command for running venv: .\venv\Scripts\activate.ps1
 
@@ -35,17 +178,6 @@ sheet_id = "1Jc7roe2tmtVx-0hdn6DPI2zDh6NcPyWLBMVZN20a5WM"
 sh = client.open_by_key(sheet_id)
 
 # defining color hex codes for formatting
-Colors = {
-    "bg": [207 / 255.0, 226 / 255.0, 243 / 255.0],
-    "Gray_1": [183 / 255.0, 183 / 255.0, 183 / 255.0],
-    "Gray_2": [204 / 255.0, 204 / 255.0, 204 / 255.0],
-    "Gray_3": [217 / 255.0, 217 / 255.0, 217 / 255.0],
-    "Purple_1": [103 / 255.0, 78 / 255.0, 167 / 255.0],
-    "Purple_2": [142 / 255.0, 124 / 255.0, 195 / 255.0],
-    "Purple_3": [180 / 255.0, 167 / 255.0, 214 / 255.0],
-    "Blue": [61 / 255.0, 133 / 255.0, 198 / 255.0],
-    "Black": [0, 0, 0]
-}
 
 # Get artist data
 token = get_token()
@@ -226,3 +358,5 @@ exponential_backoff(worksheet.format, f"Q{pos + 18}", {
     "verticalAlignment" : "TOP",
     "wrapStrategy": "WRAP"
 })
+
+format_album(worksheet, artist.album_objects[0], 6, 0)
