@@ -162,8 +162,11 @@ def format_album(worksheet, alb, pos, i):
     exponential_backoff(worksheet.update_acell, f"K{pos + 2}", "Rating")
 
     # Formatting songs
-    # for i in range(len(alb.song_titles)):
-    #     print
+    for i in range(len(alb.song_titles)):
+        exponential_backoff(worksheet.merge_cells, f"F{pos + 3 + i}:I{pos + 3 + i}")
+        exponential_backoff(worksheet.update_acell, f"E{pos + 3 + i}", i + 1)   
+        exponential_backoff(worksheet.update_acell, f"F{pos + 3 + i}", alb.song_titles[i])
+        exponential_backoff(worksheet.update_acell, f"J{pos + 3 + i}", alb.song_lens[i])
 
 # For my own reference lol \/\/\/
 # command for running venv: .\venv\Scripts\activate.ps1
@@ -183,6 +186,8 @@ sh = client.open_by_key(sheet_id)
 token = get_token()
 artist = Artist(token, "Opeth")
 worksheet = sh.worksheet(artist.artist_name)
+
+worksheet.hide_gridlines()
 
 # Setting background color & font for all cells
 exponential_backoff(worksheet.format, "A1:V500", {
@@ -359,4 +364,12 @@ exponential_backoff(worksheet.format, f"Q{pos + 18}", {
     "wrapStrategy": "WRAP"
 })
 
-format_album(worksheet, artist.album_objects[0], 6, 0)
+# Starting row for first album, same for every spreadsheet
+pos = 6
+
+# Formatting every album, iterating thru album_objects backwards so
+#   albums are displayed in chronological order
+for i in range(len(artist.album_objects) - 1, -1, -1):
+    alb_num = len(artist.album_objects) - i - 1
+    format_album(worksheet, artist.album_objects[i], pos, alb_num)
+    pos += 4 + len(artist.album_objects[i].song_titles)
