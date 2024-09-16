@@ -4,12 +4,10 @@ Inspiration for spreadsheet [here](https://docs.google.com/spreadsheets/d/1xHZ8X
 
 Spreadsheet maintained by the code in this repository [here](https://docs.google.com/spreadsheets/d/1Jc7roe2tmtVx-0hdn6DPI2zDh6NcPyWLBMVZN20a5WM/edit?usp=sharing)
 
-I know the spreadsheet doesn't look too impressive yet, but I'm close to implementing a lot of that functionality
-
 ### Functionality to implement:
 
 - [x] Access spreadsheet
-- [ ] Format artist albums
+- [x] Format artist albums
 - [x] Format arist non-album section
 - [ ] Generate new sheets when band name added to list
 - [ ] Trigger python scripts when specific cells update
