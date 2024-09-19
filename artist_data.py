@@ -3,6 +3,7 @@ import os
 import base64
 from requests import post, get
 import json
+from filter_items import *
 
 load_dotenv()
 
@@ -137,3 +138,21 @@ class Album:
             if (minutes < 10):
                 minutes = "0" + str(minutes)
             return f"{minutes}:{seconds}:{hours}"
+        
+
+token = get_token()
+
+artist = Artist(token, "Opeth")
+
+num_albs = len(artist.album_objects)
+
+filter_albums(artist.album_objects)
+
+for alb in artist.album_objects:
+    print(alb.album_title + " " + alb.release_date + "\n")
+    for i in range(len(alb.song_titles)):
+        print(alb.song_titles[i] + " " + alb.song_lens[i])
+    print("\n")
+
+print(f"before: {num_albs}\n")
+print(f"after: {len(artist.album_objects)}")
