@@ -1,4 +1,5 @@
-from artist_data import Artist, Album
+# from artist_data import Artist, 
+from artist_data import *
 
 '''
 Writing functions to filter through album and song titles to avoid repeats
@@ -44,16 +45,13 @@ ex. Artist: Opeth
 
 def filter_albums(album_objects):
     # Checking for repeat releases (Remastered, Special Edition, etc.)
-    end = len(album_objects)
-    for i in range(1, end):
+    for i in range(len(album_objects) - 2, -1, -1):
         # Usually remastered album after original in list
-        if (album_objects[i - 1] in album_objects[i]):
+        if (album_objects[i].album_title in album_objects[i + 1].album_title):
             # deleting repeats
             del album_objects[i]
             # moving back in array to check if there are multiple duplicates (ex. Opeth)
-            i -= 1
-            # dynamically change ending index for range of for loop, prevent index out of bounds
-            end -= 1
+            i += 1
     
     # Checking for live and compilation albums, cleaning remaining album and song titles
     for album in album_objects:
@@ -64,7 +62,11 @@ def filter_albums(album_objects):
             del album
             continue
         clean_alb_title(album)
+        # for i in range(len(album.song_titles)):
         for song in album.song_titles:
+            # if "live" in album.song_titles[i].lower():
+            #     del album.song_titles[i]
+            #     del album
             clean_song_title(song)
 
 def check_comp(title):
@@ -108,3 +110,15 @@ def clean_song_title(title):
         pos = title.find(r)
         if (pos > -1):
             title[0:pos].strip()
+
+# token = get_token()
+
+# artist = Artist(token, "Opeth")
+
+# filter_albums(artist.album_objects)
+
+# for alb in artist.album_objects:
+#     print(alb.album_title + " " + alb.release_date + "\n")
+#     for i in range(len(alb.song_titles)):
+#         print(alb.song_titles[i] + " " + alb.song_lens[i])
+#     print("\n")
