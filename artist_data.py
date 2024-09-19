@@ -14,7 +14,6 @@ def get_token():
     auth_string = client_id + ":" + client_secret
     auth_bytes = auth_string.encode("utf-8")
     auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
-    
     url = "https://accounts.spotify.com/api/token"
     headers = {
         "Authorization": "Basic " + auth_base64,
@@ -58,7 +57,7 @@ class Artist:
     def get_albums(self):
         # structuring request
         url = f"https://api.spotify.com/v1/artists/{self.artist_id}/albums?include_groups=album&market=US&limit=50"
-        headers = get_auth_header(token)
+        headers = get_auth_header(self.token)
         result = get(url, headers=headers)
 
         # parsing json content to make data easier to access
@@ -68,7 +67,7 @@ class Artist:
         
         # creating Album objects with album id's
         for i in range(len(album_data["items"])):
-            album = Album(token, album_data, i)
+            album = Album(self.token, album_data, i)
             album_objects.append(album)
 
         # self.album_titles = album_titles
@@ -87,13 +86,12 @@ class Album:
         self.album_title = album_data["items"][album_num]["name"]
         self.release_date = album_data["items"][album_num]["release_date"][0:4]
         self.cover = album_data["items"][album_num]["images"][0]["url"]
-
         self.get_song_data()
 
     def get_song_data(self):
         # structuring request
         url = f"https://api.spotify.com/v1/albums/{self.album_id}/tracks?market=US&limit=50&offset=0"
-        headers = get_auth_header(token)
+        headers = get_auth_header(self.token)
         result = get(url, headers=headers)
 
         # parsing json content again
@@ -108,13 +106,14 @@ class Album:
         song_ids = []
         song_lens = []
         album_len = 0
-        # print(song_data)
+        # Assigning data for each song on the album
         for s in song_data["items"]:
             song_titles.append(s["name"])
             song_ids.append(s["id"])
             song_lens.append(self.millis_to_mins(s["duration_ms"]))
+            # Keeping track of overall length of album to convert to hr:min:sec later
             album_len += s["duration_ms"]
-        
+
         self.song_titles = song_titles
         self.song_ids = song_ids
         self.song_lens = song_lens
@@ -138,20 +137,3 @@ class Album:
             if (minutes < 10):
                 minutes = "0" + str(minutes)
             return f"{minutes}:{seconds}:{hours}"
-
-# \/\/\/ Testing \/\/\/
-
-token = get_token()
-
-# artist = Artist(token, "Opeth")
-
-# print(artist.album_objects[18].album_title)
-
-# print(artist.album_objects[18].release_date)
-
-# print(artist.album_objects[18].album_len)
-
-# print(artist.album_objects[18].cover)
-
-# for i in range(len(artist.album_objects[18].song_titles)):
-#     print(artist.album_objects[18].song_titles[i] + " " + artist.album_objects[18].song_lens[i])
