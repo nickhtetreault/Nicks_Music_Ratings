@@ -68,8 +68,26 @@ class Artist:
         
         # creating Album objects with album id's
         for i in range(len(album_data["items"])):
+            if (" live" in album_data["items"][i]["name"].lower() or "live " in album_data["items"][i]["name"].lower()):
+                continue
+            if (check_bad(album_data["items"][i]["name"])):
+                continue
             album = Album(self.token, album_data, i)
+            album.clean_title()
             album_objects.append(album)
+        
+        for i in range(len(album_objects) - 1, -1, -1):
+        # Usually remastered album after original in list
+            # print(f"pos {i}: {album_objects[i].album_title}")
+            if (album_objects[i].album_title in album_objects[i - 1].album_title):
+                # deleting repeats
+                # print("removed: " + album_objects[i - 1].album_title)
+                del album_objects[i - 1]
+                # moving back in array to check if there are multiple duplicates (ex. Opeth)
+                i += 1
+
+        # for alb in album_objects:
+        #     alb.clean_title()
 
         # self.album_titles = album_titles
         self.album_objects = album_objects
@@ -109,7 +127,10 @@ class Album:
         album_len = 0
         # Assigning data for each song on the album
         for s in song_data["items"]:
-            song_titles.append(s["name"])
+            if "- live" in s["name"].lower() or "(live)" in s["name"].lower():
+                continue
+            song = clean_song_title(s["name"])
+            song_titles.append(song)
             song_ids.append(s["id"])
             song_lens.append(self.millis_to_mins(s["duration_ms"]))
             # Keeping track of overall length of album to convert to hr:min:sec later
@@ -138,7 +159,9 @@ class Album:
             if (minutes < 10):
                 minutes = "0" + str(minutes)
             return f"{minutes}:{seconds}:{hours}"
-        
+    
+    def clean_title(self):
+        self.album_title = clean_alb_title(self)
 
 token = get_token()
 
@@ -146,7 +169,7 @@ artist = Artist(token, "Opeth")
 
 num_albs = len(artist.album_objects)
 
-filter_albums(artist.album_objects)
+print()
 
 for alb in artist.album_objects:
     print(alb.album_title + " " + alb.release_date + "\n")
@@ -154,5 +177,8 @@ for alb in artist.album_objects:
         print(alb.song_titles[i] + " " + alb.song_lens[i])
     print("\n")
 
-print(f"before: {num_albs}\n")
-print(f"after: {len(artist.album_objects)}")
+print(num_albs)
+
+# print(f"before: {num_albs}\n")
+# print(f"after: {len(artist.album_objects)}")
+
