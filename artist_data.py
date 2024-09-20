@@ -73,23 +73,17 @@ class Artist:
             if (check_bad(album_data["items"][i]["name"])):
                 continue
             album = Album(self.token, album_data, i)
-            album.clean_title()
             album_objects.append(album)
         
         for i in range(len(album_objects) - 1, -1, -1):
-        # Usually remastered album after original in list
-            # print(f"pos {i}: {album_objects[i].album_title}")
             if (album_objects[i].album_title in album_objects[i - 1].album_title):
                 # deleting repeats
-                # print("removed: " + album_objects[i - 1].album_title)
+                # if it takes the wrong album later: change implementation to preserve alb with fewest songs
+                # usually album with fewest songs is the original
                 del album_objects[i - 1]
                 # moving back in array to check if there are multiple duplicates (ex. Opeth)
                 i += 1
 
-        # for alb in album_objects:
-        #     alb.clean_title()
-
-        # self.album_titles = album_titles
         self.album_objects = album_objects
 
 
@@ -102,8 +96,8 @@ class Album:
 
         # deriving vars from album_data
         self.album_id = album_data["items"][album_num]["id"]
-        self.album_title = album_data["items"][album_num]["name"]
         self.release_date = album_data["items"][album_num]["release_date"][0:4]
+        self.album_title = clean_alb_title(album_data["items"][album_num]["name"], self.release_date)
         self.cover = album_data["items"][album_num]["images"][0]["url"]
         self.get_song_data()
 
@@ -127,7 +121,7 @@ class Album:
         album_len = 0
         # Assigning data for each song on the album
         for s in song_data["items"]:
-            if "- live" in s["name"].lower() or "(live)" in s["name"].lower():
+            if " live" in s["name"].lower() or "(live)" in s["name"].lower():
                 continue
             song = clean_song_title(s["name"])
             song_titles.append(song)
@@ -159,9 +153,9 @@ class Album:
             if (minutes < 10):
                 minutes = "0" + str(minutes)
             return f"{minutes}:{seconds}:{hours}"
-    
-    def clean_title(self):
-        self.album_title = clean_alb_title(self)
+
+
+# \/\/\/ TEST CODE \/\/\/
 
 token = get_token()
 
@@ -169,7 +163,7 @@ artist = Artist(token, "Opeth")
 
 num_albs = len(artist.album_objects)
 
-print()
+# print()
 
 for alb in artist.album_objects:
     print(alb.album_title + " " + alb.release_date + "\n")
