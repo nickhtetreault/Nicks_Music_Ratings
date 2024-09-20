@@ -1,6 +1,3 @@
-# from artist_data import Artist, 
-# from artist_data import *
-
 '''
 Writing functions to filter through album and song titles to avoid repeats
 
@@ -41,33 +38,14 @@ ex. Artist: Opeth
 2001: Blackwater Park
     The Leper Affinity - Live
         - Remove track from list (bonus live track, repeat of first track)
-'''
 
-def filter_albums(album_objects):
-    # Checking for repeat releases (Remastered, Special Edition, etc.)
-    for i in range(len(album_objects) - 2, -1, -1):
-        # Usually remastered album after original in list
-        if (album_objects[i].album_title in album_objects[i + 1].album_title):
-            # deleting repeats
-            del album_objects[i]
-            # moving back in array to check if there are multiple duplicates (ex. Opeth)
-            i += 1
-    
-    # Checking for live and compilation albums, cleaning remaining album and song titles
-    for album in album_objects:
-        if ("live" in album.album_title.lower()):
-            del album
-            continue
-        if (check_bad(album.album_title)):
-            del album
-            continue
-        clean_alb_title(album)
-        # for i in range(len(album.song_titles)):
-        # for song in album.song_titles:
-            # if "live" in album.song_titles[i].lower():
-            #     del album.song_titles[i]
-            #     del album
-            # clean_song_title(song)
+        
+The following filters seem to work for now, but there will definitely be exceptions
+I plan to later add implementation that allows the user to request a "re-filter" of the artist data,
+where a new request to filter the artist data will call a different filter protocol
+    i.e using chatgpt api to return a list of artist's studio albums and comparing these to the albums 
+    returned by spotify use as a filter 
+'''
 
 def check_bad(title):
     bad = [
@@ -88,10 +66,10 @@ def check_bad(title):
     return False
 
 
-def clean_alb_title(album):
+def clean_alb_title(title, release):
     remove = [
-        f"({album.release_date} Remaster)",
-        f"{album.release_date} Remaster",
+        f"({release} Remaster)",
+        f"{release} Remaster",
         "(Extended Edition)",
         "- Extended Edition",
         "Extended Edition",
@@ -101,13 +79,12 @@ def clean_alb_title(album):
         "Remastered",
         "(Remaster)",
         "Remaster",
-
     ]
     for r in remove:
-        pos = album.album_title.find(r)
+        pos = title.find(r)
         if (pos > -1):
-            return album.album_title[0:pos].strip()
-    return album.album_title
+            return title[0:pos].strip()
+    return title
 
 def clean_song_title(title):
     remove = [
@@ -125,15 +102,3 @@ def clean_song_title(title):
         if (pos > -1):
             return title[:pos].strip()
     return title
-
-# token = get_token()
-
-# artist = Artist(token, "Opeth")
-
-# filter_albums(artist.album_objects)
-
-# for alb in artist.album_objects:
-#     print(alb.album_title + " " + alb.release_date + "\n")
-#     for i in range(len(alb.song_titles)):
-#         print(alb.song_titles[i] + " " + alb.song_lens[i])
-#     print("\n")
