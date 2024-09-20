@@ -1,5 +1,5 @@
 # from artist_data import Artist, 
-from artist_data import *
+# from artist_data import *
 
 '''
 Writing functions to filter through album and song titles to avoid repeats
@@ -58,58 +58,73 @@ def filter_albums(album_objects):
         if ("live" in album.album_title.lower()):
             del album
             continue
-        if (check_comp(album.album_title)):
+        if (check_bad(album.album_title)):
             del album
             continue
         clean_alb_title(album)
         # for i in range(len(album.song_titles)):
-        for song in album.song_titles:
+        # for song in album.song_titles:
             # if "live" in album.song_titles[i].lower():
             #     del album.song_titles[i]
             #     del album
-            clean_song_title(song)
+            # clean_song_title(song)
 
-def check_comp(title):
-    remove = [
+def check_bad(title):
+    bad = [
         "best of",
         "presents",
         "compilation",
         "greatest hits",
         "singles collection",
         "collection",
+        "remix",
+        "remixed",
+        "extended edition",
+        "tapes"
     ]
-    return (r in title.lower() for r in remove)
+    for b in bad:
+        if (b in title.lower()):
+            return True
+    return False
 
 
 def clean_alb_title(album):
     remove = [
+        f"({album.release_date} Remaster)",
+        f"{album.release_date} Remaster",
+        "(Extended Edition)",
+        "- Extended Edition",
+        "Extended Edition",
+        "(Special Edition)",
+        "Special Edition",
         "(Remastered)",
         "Remastered",
         "(Remaster)",
         "Remaster",
-        "(Special Edition)",
-        "Special Edition",
-        f"({album.release_date} Remaster)",
-        f"{album.release_date} Remaster",
+
     ]
     for r in remove:
         pos = album.album_title.find(r)
         if (pos > -1):
-            album.abum_title[0:pos].strip()
+            return album.album_title[0:pos].strip()
+    return album.album_title
 
 def clean_song_title(title):
     remove = [
         "(Remastered)",
-        "Remastered",
         "(Remaster)",
-        "Remaster",
         "(Special Edition)",
+        " - Remastered",
+        " - Remaster",
         "Special Edition",
+        "Remastered",
+        "Remaster"
     ]
     for r in remove:
         pos = title.find(r)
         if (pos > -1):
-            title[0:pos].strip()
+            return title[:pos].strip()
+    return title
 
 # token = get_token()
 
