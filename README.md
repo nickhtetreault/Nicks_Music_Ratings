@@ -9,6 +9,9 @@ Spreadsheet maintained by the code in this repository [here](https://docs.google
 - [x] Access spreadsheet
 - [x] Format artist albums
 - [x] Format arist non-album section
+- [ ] Design new "home" page
+    - [ ] Embed link to generated spreadsheet in cell
+- [ ] Make spreadsheets update upon new releases (w/o overwriting)
 - [ ] Generate new sheets when band name added to list
 - [ ] Trigger python scripts when specific cells update
     - [ ] Create new sheet for artist entered on List of Artists sheet
@@ -23,7 +26,8 @@ Spreadsheet maintained by the code in this repository [here](https://docs.google
 - [x] Access spotify api
 - [x] Get band data
     - [x] List of album titles
-        - [ ] Filter out live albums and repeat releases
+        - [x] Filter out live albums and repeat releases
+        - [ ] Add backup filter protocols if others fail
     - [x] List of songs for each album
     - [x] Song lengths
     - [x] Album release years
