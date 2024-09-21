@@ -50,6 +50,10 @@ class Artist:
             print("No artist found with this name")
             return None
         
+        if (json_result[0]["name"] != artist_name):
+            print (f"Expected {artist_name} but found {json_result[0]["name"]}")
+            return None
+        
         self.artist_id = json_result[0]["id"]
 
         # calling get_albums, breaking up the functions so I don't have to put everything in init
