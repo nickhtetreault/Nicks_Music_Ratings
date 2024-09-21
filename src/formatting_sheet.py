@@ -3,8 +3,8 @@ import time
 import random
 from gspread_formatting import *
 from google.oauth2.service_account import Credentials
-from artist_data import Artist, Album
-from artist_data import *
+from src.artist_data import Artist, Album
+from src.artist_data import *
 
 Colors = {
     "bg": [207 / 255.0, 226 / 255.0, 243 / 255.0],

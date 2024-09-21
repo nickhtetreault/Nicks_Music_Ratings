@@ -3,7 +3,7 @@ import os
 import base64
 from requests import post, get
 import json
-from filter_items import *
+from src.filter_items import *
 
 load_dotenv()
 
