@@ -190,7 +190,7 @@ worksheet = sh.worksheet(artist.artist_name)
 worksheet.hide_gridlines()
 
 # Setting background color & font for all cells
-exponential_backoff(worksheet.format, "A1:V500", {
+exponential_backoff(worksheet.format, "A1:W500", {
     "backgroundColor": {
         "red": Colors["bg"][0],
         "green": Colors["bg"][1],
@@ -230,7 +230,7 @@ exponential_backoff(worksheet.merge_cells, "B2:O4")
 exponential_backoff(worksheet.update_acell, "B2", artist.artist_name)
 
 # Formatting album rankings
-exponential_backoff(worksheet.format, "Q2:U4", {
+exponential_backoff(worksheet.format, "Q2:V4", {
     "backgroundColor": {
         "red": Colors["Gray_1"][0],
         "green": Colors["Gray_1"][1],
@@ -245,16 +245,16 @@ exponential_backoff(worksheet.format, "Q2:U4", {
             "blue": Colors["Purple_1"][2]
         },
         "fontFamily": "Roboto Serif",
-        "fontSize": 32,
+        "fontSize": 38,
         "bold": True
     }
 })
 
 # Merge album ranking cells and update
-exponential_backoff(worksheet.merge_cells, "Q2:U4")
+exponential_backoff(worksheet.merge_cells, "Q2:V4")
 exponential_backoff(worksheet.update_acell, "Q2", "Album Rankings")
 
-exponential_backoff(worksheet.format, "Q5:U5", {
+exponential_backoff(worksheet.format, "Q5:V5", {
     "horizontalAlignment": "CENTER",
     "verticalAlignment": "MIDDLE",
     "textFormat": {
@@ -269,21 +269,21 @@ exponential_backoff(worksheet.format, "Q5:U5", {
     }
 })
 
-exponential_backoff(worksheet.merge_cells, "R5:T5")
+exponential_backoff(worksheet.merge_cells, "R5:U5")
 
 exponential_backoff(worksheet.update_acell, "Q5", "#")
 exponential_backoff(worksheet.update_acell, "R5", "Title")
-exponential_backoff(worksheet.update_acell, "U5", "Rating")
+exponential_backoff(worksheet.update_acell, "V5", "Rating")
 
 # Adding album numbers and merging cells
 for i in range(len(artist.album_objects)):
     exponential_backoff(worksheet.update_acell, f"Q{6 + i}", i + 1)
-    exponential_backoff(worksheet.merge_cells, f"R{6 + i}:T{6 + i}")
+    exponential_backoff(worksheet.merge_cells, f"R{6 + i}:U{6 + i}")
 
 # Formatting song rankings
 pos = 7 + len(artist.album_objects)
 
-exponential_backoff(worksheet.format, f"Q{pos}:U{pos + 2}", {
+exponential_backoff(worksheet.format, f"Q{pos}:V{pos + 2}", {
     "backgroundColor": {
         "red": Colors["Gray_1"][0],
         "green": Colors["Gray_1"][1],
@@ -298,16 +298,16 @@ exponential_backoff(worksheet.format, f"Q{pos}:U{pos + 2}", {
             "blue": Colors["Purple_1"][2]
         },
         "fontFamily": "Roboto Serif",
-        "fontSize": 32,
+        "fontSize": 38,
         "bold": True
     }
 })
 
 # Merge song ranking header cells
-exponential_backoff(worksheet.merge_cells, f"Q{pos}:U{pos + 2}")
+exponential_backoff(worksheet.merge_cells, f"Q{pos}:V{pos + 2}")
 exponential_backoff(worksheet.update_acell, f"Q{pos}", "Top 10 Songs")
 
-exponential_backoff(worksheet.format, f"Q{pos + 3}:U{pos + 3}", {
+exponential_backoff(worksheet.format, f"Q{pos + 3}:V{pos + 3}", {
     "horizontalAlignment": "CENTER",
     "verticalAlignment": "MIDDLE",
     "textFormat": {
@@ -323,18 +323,18 @@ exponential_backoff(worksheet.format, f"Q{pos + 3}:U{pos + 3}", {
 })
 
 # Add song ranking headers
-exponential_backoff(worksheet.merge_cells, f"R{pos + 3}:T{pos + 3}")
+exponential_backoff(worksheet.merge_cells, f"R{pos + 3}:U{pos + 3}")
 exponential_backoff(worksheet.update_acell, f"Q{pos + 3}", "#")
 exponential_backoff(worksheet.update_acell, f"R{pos + 3}", "Title")
-exponential_backoff(worksheet.update_acell, f"U{pos + 3}", "Rating")
+exponential_backoff(worksheet.update_acell, f"V{pos + 3}", "Rating")
 
 # Add song rankings
 for i in range(10):
     exponential_backoff(worksheet.update_acell, f"Q{pos + 4 + i}", i + 1)
-    exponential_backoff(worksheet.merge_cells, f"R{pos + 4 + i}:T{pos + 4 + i}")
+    exponential_backoff(worksheet.merge_cells, f"R{pos + 4 + i}:U{pos + 4 + i}")
 
 # Add Comments
-exponential_backoff(worksheet.format, f"Q{pos + 15}:U{pos + 17}", {
+exponential_backoff(worksheet.format, f"Q{pos + 15}:V{pos + 17}", {
     "backgroundColor": {
         "red": Colors["Gray_1"][0],
         "green": Colors["Gray_1"][1],
@@ -349,15 +349,15 @@ exponential_backoff(worksheet.format, f"Q{pos + 15}:U{pos + 17}", {
             "blue": Colors["Purple_1"][2]
         },
         "fontFamily": "Roboto Serif",
-        "fontSize": 32,
+        "fontSize": 38,
         "bold": True
     }
 })
 
-exponential_backoff(worksheet.merge_cells, f"Q{pos + 15}:U{pos + 17}")
+exponential_backoff(worksheet.merge_cells, f"Q{pos + 15}:V{pos + 17}")
 exponential_backoff(worksheet.update_acell, f"Q{pos + 15}", "Comments")
 
-exponential_backoff(worksheet.merge_cells, f"Q{pos + 18}:U{pos + 33}")
+exponential_backoff(worksheet.merge_cells, f"Q{pos + 18}:V{pos + 33}")
 exponential_backoff(worksheet.format, f"Q{pos + 18}", {
     "horizontalAlignment": "LEFT",
     "verticalAlignment" : "TOP",
