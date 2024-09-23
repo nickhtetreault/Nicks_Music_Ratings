@@ -3,7 +3,7 @@ import os
 import base64
 from requests import post, get
 import json
-from src.filter_items import *
+from filter_items import *
 
 load_dotenv()
 
@@ -51,7 +51,8 @@ class Artist:
             return None
         
         if (json_result[0]["name"] != artist_name):
-            print (f"Expected {artist_name} but found {json_result[0]["name"]}")
+            name = json_result[0]["name"]
+            print (f"Expected {artist_name} but found {name}")
             return None
         
         self.artist_id = json_result[0]["id"]
@@ -163,7 +164,7 @@ class Album:
 
 token = get_token()
 
-artist = Artist(token, "Opeth")
+artist = Artist(token, "Vacations")
 
 num_albs = len(artist.album_objects)
 
