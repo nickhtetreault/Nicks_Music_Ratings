@@ -9,7 +9,7 @@ Spreadsheet maintained by the code in this repository [here](https://docs.google
 - [x] Access spreadsheet
 - [x] Format artist albums
 - [x] Format arist non-album section
-- [ ] Design new "home" page
+- [x] Design new "home" page
     - [ ] Embed link to generated spreadsheet in cell
 - [ ] Make spreadsheets update upon new releases (w/o overwriting)
 - [ ] Generate new sheets when band name added to list
@@ -27,7 +27,7 @@ Spreadsheet maintained by the code in this repository [here](https://docs.google
 - [x] Get band data
     - [x] List of album titles
         - [x] Filter out live albums and repeat releases
-        - [ ] Add backup filter protocols if others fail
+        - [x] Add backup filter protocols if others fail
     - [x] List of songs for each album
     - [x] Song lengths
     - [x] Album release years
