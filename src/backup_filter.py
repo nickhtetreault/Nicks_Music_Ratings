@@ -20,7 +20,7 @@ def get_gemini_data(artist_name):
 
     return albs
 
-albs = get_gemini_data("Led Zeppelin")
+albs = get_gemini_data("Vacations")
 
 for alb in albs:
     print(alb)
