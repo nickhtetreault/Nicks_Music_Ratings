@@ -9,9 +9,10 @@ Spreadsheet maintained by the code in this repository [here](https://docs.google
 - [x] Access spreadsheet
 - [x] Format artist albums
 - [x] Format arist non-album section
-- [ ] Design new "home" page
-    - [ ] Embed link to generated spreadsheet in cell
+- [x] Design new "home" page
+    - [x] Embed link to generated spreadsheet in cell
 - [ ] Make spreadsheets update upon new releases (w/o overwriting)
+    - [ ] Deploy web hook on cloud to accomplish
 - [ ] Generate new sheets when band name added to list
 - [ ] Trigger python scripts when specific cells update
     - [ ] Create new sheet for artist entered on List of Artists sheet
