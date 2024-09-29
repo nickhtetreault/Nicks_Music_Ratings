@@ -3,8 +3,8 @@ import time
 import random
 from gspread_formatting import *
 from google.oauth2.service_account import Credentials
-from src.artist_data import Artist, Album
-from src.artist_data import *
+from artist_data import Artist, Album
+from artist_data import *
 
 Colors = {
     "bg": [207 / 255.0, 226 / 255.0, 243 / 255.0],
@@ -28,7 +28,7 @@ def exponential_backoff(func, *args, max_retries=8, **kwargs):
         except gspread.exceptions.APIError as e:
             # Calculate backoff time: base delay * (2^retries) + random jitter
             backoff_time = (2 ** retries) + random.uniform(0, 1)
-            print(f"Request failed with error: {e}. Retrying in {backoff_time} seconds...")
+            print(f"Request failed with {e}. Retrying in {backoff_time} seconds...")
             time.sleep(backoff_time)
             retries += 1
     
@@ -173,7 +173,7 @@ def format_album(worksheet, alb, pos, i):
 
 # authorizing code to edit my spreadsheets with credentials (hidden)
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
+creds = Credentials.from_service_account_file("C:\\Users\\pickl\\OneDrive\\Desktop\\Nicks_music_ratings\\Credentials.json", scopes=scopes)
 client = gspread.authorize(creds)
 
 # opening the spreadsheet
