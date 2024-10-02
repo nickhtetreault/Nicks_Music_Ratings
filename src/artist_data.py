@@ -3,7 +3,7 @@ import os
 import base64
 from requests import post, get
 import json
-from src.filter_items import *
+from filter_items import *
 
 load_dotenv()
 
@@ -51,7 +51,8 @@ class Artist:
             return None
         
         if (json_result[0]["name"] != artist_name):
-            print (f"Expected {artist_name} but found {json_result[0]["name"]}")
+            name = json_result[0]["name"]
+            print (f"Expected {artist_name} but found {name}")
             return None
         
         self.artist_id = json_result[0]["id"]
@@ -169,14 +170,17 @@ num_albs = len(artist.album_objects)
 
 # print()
 
-for alb in artist.album_objects:
-    print(alb.album_title + " " + alb.release_date + "\n")
-    for i in range(len(alb.song_titles)):
-        print(alb.song_titles[i] + " " + alb.song_lens[i])
-    print("\n")
+# for alb in artist.album_objects:
+#     print(alb.album_title + " " + alb.release_date + "\n")
+#     for i in range(len(alb.song_titles)):
+#         print(alb.song_titles[i] + " " + alb.song_lens[i])
+#     print("\n")
 
-print(num_albs)
+# print(num_albs)
 
 # print(f"before: {num_albs}\n")
 # print(f"after: {len(artist.album_objects)}")
 
+# for album in artist.album_objects:
+#     if not album.song_titles or not album.release_date or not album.album_title:
+#         print(f"Album has missing data: {album}")
