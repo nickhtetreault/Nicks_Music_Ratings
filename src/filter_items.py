@@ -58,7 +58,11 @@ def check_bad(title):
         "remix",
         "remixed",
         "extended edition",
-        "tapes"
+        "tapes",
+        "reissue",
+        "unfinished",
+        "deluxe",
+        "special edition"
     ]
     for b in bad:
         if (b in title.lower()):
