@@ -1,6 +1,7 @@
 import gspread
 import time
 import random
+import requests
 from gspread_formatting import *
 from google.oauth2.service_account import Credentials
 from artist_data import Artist, Album
@@ -18,20 +19,24 @@ Colors = {
     "Black": [0, 0, 0]
 }
 
-# Exponential backoff retry function
+# Exponential backoff retry function with broader exception handling
 def exponential_backoff(func, *args, max_retries=8, **kwargs):
     retries = 0
     while retries < max_retries:
         try:
             # Attempt the operation
             return func(*args, **kwargs)
-        except gspread.exceptions.APIError as e:
+        except (gspread.exceptions.APIError, requests.exceptions.RequestException) as e:
+            # Log the error and handle the backoff
             # Calculate backoff time: base delay * (2^retries) + random jitter
             backoff_time = (2 ** retries) + random.uniform(0, 1)
-            print(f"Request failed with {e}. Retrying in {backoff_time} seconds...")
+            # print(f"Retrying in {backoff_time} seconds...")
+            print(f"Request failed with {type(e).__name__}: {e}. Retrying in {backoff_time} seconds...")
+            
             time.sleep(backoff_time)
             retries += 1
     
+    # If max retries are exceeded, raise an exception
     raise Exception("Maximum retries exceeded")
 
 def format_album(worksheet, alb, pos, i):
