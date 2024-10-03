@@ -94,15 +94,53 @@ def batch_update_album(worksheet, artist):
     # Execute the batch update with a single API call
     exponential_backoff(worksheet.batch_update, batch_requests)
 
+def add_merge(range, merge_type, sheetId):
+    convert_range = gspread.utils.a1_range_to_grid_range(range)
+    return {
+        "mergeCells": {
+            "range": {
+                "sheetId": sheetId,
+                "startRowIndex": convert_range["startRowIndex"],
+                "endRowIndex": convert_range["endRowIndex"],
+                "startColumnIndex": convert_range["startColumnIndex"],
+                "endColumnIndex": convert_range["endColumnIndex"]
+            },
+            "mergeType": merge_type
+        }
+    }
+
+def add_format(range, bg, font_color, font_size, bold):
+    return {
+        "range": range,
+        "format": {
+            "backgroundColor": {
+                "red": Colors[bg][0],
+                "green": Colors[bg][1],
+                "blue": Colors[bg][2]
+            },
+            "horizontalAlignment": "CENTER",
+            "verticalAlignment": "MIDDLE",
+            "textFormat": {
+                "foregroundColor": {
+                    "red": Colors[font_color][0],
+                    "green": Colors[font_color][1],
+                    "blue": Colors[font_color][2]
+                },
+                "fontFamily": "Roboto Serif",
+                "fontSize": font_size,
+                "bold": bold
+            }
+        }
+    }
+
 # authorizing code to edit my spreadsheets with credentials (hidden)
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
 creds = Credentials.from_service_account_file("C:\\Users\\pickl\\OneDrive\\Desktop\\Nicks_music_ratings\\Credentials.json", scopes=scopes)
 client = gspread.authorize(creds)
 
 # opening the spreadsheet
-sheet_id = "1Jc7roe2tmtVx-0hdn6DPI2zDh6NcPyWLBMVZN20a5WM"
-sh = client.open_by_key(sheet_id)
-
+spreadsheet_id = "1Jc7roe2tmtVx-0hdn6DPI2zDh6NcPyWLBMVZN20a5WM"
+sh = client.open_by_key(spreadsheet_id)
 
 # Get artist data
 token = get_token()
@@ -110,157 +148,73 @@ artist = Artist(token, "The Dillinger Escape Plan")
 # create worksheet later once testing is done
 worksheet = sh.worksheet(artist.artist_name)
 
-worksheet.hide_gridlines()
+sheetId = worksheet._properties['sheetId']
+
+# worksheet.hide_gridlines()
+
 # batch_update_album(worksheet, artist)
 
 
 # Format requests for Artist name, album rankings, song rankings, comments
-formats = [
-    # Formatting all cells
-    {
-        "range": "A1:W500",
-        "format": {
-            "backgroundColor": {
-                "red": Colors["bg"][0],
-                "green": Colors["bg"][1],
-                "blue": Colors["bg"][2]
-            },
-            "horizontalAlignment": "CENTER",
-            "verticalAlignment": "MIDDLE",
-            "textFormat": {
-                "fontFamily": "Roboto Serif",
-                "fontSize": 10
-            },
-        },
-    },
-    # Artist name header
+formats = []
+
+# Formatting all cells (essentially background)
+formats.append(add_format("A1:W500", "bg", "Black", 10, False))
+# Artist name header
+formats.append(add_format("B2:O4", "Gray_1", "Purple_1", 38, True))
+# Album ratings header
+formats.append(add_format("Q2:V4", "Gray_1", "Purple_1", 38, True))
+# Album ratings data labels
+formats.append(add_format("Q5:V5", "bg", "Purple_3", 10, True))
+# Song ratings header
+pos = 7 + len(artist.album_objects) # placing based on number of albums
+formats.append(add_format(f"Q{pos}:V{pos + 2}", "Gray_1", "Purple_1", 38, True))
+# Song ratings data labels
+formats.append(add_format(f"Q{pos + 3}:V{pos + 3}", "bg", "Purple_3", 10, True))
+# Comments header
+formats.append(add_format(f"Q{pos + 15}:V{pos + 17}", "Gray_1", "Purple_1", 38, True))
+# Comments text formatting
+formats.append({
+    "range": f"Q{pos + 18}:V{pos + 33}",
+    "format": {
+        "horizontalAlignment": "LEFT",
+        "verticalAlignment" : "TOP",
+        "wrapStrategy": "WRAP"
+    }
+})
+
+
+# merges for everything idk lol
+merges = []
+
+# merging artist name header
+merges.append(add_merge("B2:O4", "MERGE_ALL", sheetId))
+# merging album rankings header
+merges.append(add_merge("Q2:V4", "MERGE_ALL", sheetId))
+# merging song rankings header
+merges.append(add_merge(f"Q{pos}:V{pos + 2}", "MERGE_ALL", sheetId))
+# merging comments header
+merges.append(add_merge(f"Q{pos + 15}:V{pos + 17}", "MERGE_ALL", sheetId))
+# merging comments text
+merges.append(add_merge(f"Q{pos + 18}:V{pos + 33}", "MERGE_ALL", sheetId))
+
+text = [ 
     {
         "range": "B2:O4",
-        "format": {
-            "backgroundColor": {
-                "red": Colors["Gray_1"][0],
-                "green": Colors["Gray_1"][1],
-                "blue": Colors["Gray_1"][2]
-            },
-            "horizontalAlignment": "CENTER",
-            "verticalAlignment": "MIDDLE",
-            "textFormat": {
-                "foregroundColor": {
-                    "red": Colors["Purple_1"][0],
-                    "green": Colors["Purple_1"][1],
-                    "blue": Colors["Purple_1"][2]
-                },
-                "fontFamily": "Roboto Serif",
-                "fontSize": 38,
-                "bold": True
-            }
-        }
-    },
-    # Album rankings header
-    {
-        "range": "Q2:V4",
-        "format": {
-            "backgroundColor": {
-                "red": Colors["Gray_1"][0],
-                "green": Colors["Gray_1"][1],
-                "blue": Colors["Gray_1"][2]
-            },
-            "horizontalAlignment": "CENTER",
-            "verticalAlignment": "MIDDLE",
-            "textFormat": {
-                "foregroundColor": {
-                    "red": Colors["Purple_1"][0],
-                    "green": Colors["Purple_1"][1],
-                    "blue": Colors["Purple_1"][2]
-                },
-                "fontFamily": "Roboto Serif",
-                "fontSize": 38,
-                "bold": True
-            }
-        }
-    },
-    # Album rankings data labels
-    {
-        "range": "Q5:V5",
-        "format": {
-            "horizontalAlignment": "CENTER",
-            "verticalAlignment": "MIDDLE",
-            "textFormat": {
-            "foregroundColor": {
-                "red": Colors["Purple_3"][0],
-                "green": Colors["Purple_3"][1],
-                "blue": Colors["Purple_3"][2]
-            },
-            "fontFamily" : "Roboto Serif",
-            "fontSize": 10,
-            "bold": True
-            }
-        }
-    },
-    {
-        "range": f"Q{len(artist.album_objects) + 7}:V{len(artist.album_objects) + 9}",
-        "format": {
-            "backgroundColor": {
-                "red": Colors["Gray_1"][0],
-                "green": Colors["Gray_1"][1],
-                "blue": Colors["Gray_1"][2]
-            },
-            "horizontalAlignment": "CENTER",
-            "verticalAlignment": "MIDDLE",
-            "textFormat": {
-                "foregroundColor": {
-                    "red": Colors["Purple_1"][0],
-                    "green": Colors["Purple_1"][1],
-                    "blue": Colors["Purple_1"][2]
-                },
-                "fontFamily": "Roboto Serif",
-                "fontSize": 38,
-                "bold": True
-            }
-        }
-    },
-    {
-        "range": f"Q{len(artist.album_objects) + 10}:V{len(artist.album_objects) + 10}",
-        "format": {
-            "horizontalAlignment": "CENTER",
-            "verticalAlignment": "MIDDLE",
-            "textFormat": {
-            "foregroundColor": {
-                "red": Colors["Purple_3"][0],
-                "green": Colors["Purple_3"][1],
-                "blue": Colors["Purple_3"][2]
-            },
-            "fontFamily" : "Roboto Serif",
-            "fontSize": 10,
-            "bold": True
-            }
-        }
-    },
-    {
-        "range": f"Q{len(artist.album_objects) + 22}:V{len(artist.album_objects) + 24}",
-        "format": {
-            "backgroundColor": {
-                "red": Colors["Gray_1"][0],
-                "green": Colors["Gray_1"][1],
-                "blue": Colors["Gray_1"][2]
-            },
-            "horizontalAlignment": "CENTER",
-            "verticalAlignment": "MIDDLE",
-            "textFormat": {
-                "foregroundColor": {
-                    "red": Colors["Purple_1"][0],
-                    "green": Colors["Purple_1"][1],
-                    "blue": Colors["Purple_1"][2]
-                },
-                "fontFamily": "Roboto Serif",
-                "fontSize": 38,
-                "bold": True
-            }
-        }
+        "values": [[artist.artist_name]]
     }
 ]
 
-# Apply the batch update to the sheet
-
+# Add album formatting and data to batch requests
 
 worksheet.batch_format(formats)
+
+body = {
+    "requests": merges
+}
+
+# worksheet.batch_update(merges)
+
+sh.batch_update(body)
+
+worksheet.batch_update(text)
