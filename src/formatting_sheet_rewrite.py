@@ -213,10 +213,31 @@ merges.append(add_merge(f"Q{pos + 15}:V{pos + 17}", "MERGE_ALL", sheetId))
 # merging comments text
 merges.append(add_merge(f"Q{pos + 18}:V{pos + 33}", "MERGE_ALL", sheetId))
 
-
+# Text to write to spreadsheet
 text = []
 
 text.append(add_text("B2:O4", artist.artist_name))
+
+# Album ratings
+text.append(add_text("Q2:V4", "Album Rankings"))
+text.append(add_text("Q5", "#"))
+text.append(add_text("R5:U5", "Title"))
+text.append(add_text("V5", "Rating"))
+
+# Adding numbers 1 up to number of albums
+for i in range(len(artist.album_objects)):
+    text.append(add_text(f"Q{6 + i}", i + 1))
+
+# Song ratings
+text.append(add_text(f"Q{pos}:V{pos + 2}", "Top 10 Songs"))
+text.append(add_text(f"Q{pos + 3}", "#"))
+text.append(add_text(f"R{pos + 3}:U{pos + 3}", "Title"))
+text.append(add_text(f"V{pos + 3}", "Rating"))
+
+for i in range(10):
+    text.append(add_text(f"Q{pos + 4 + i}", i + 1))
+
+text.append(add_text(f"Q{pos + 15}:V{pos + 17}", "Comments"))
 
 # Add album formatting and data to batch requests
 
