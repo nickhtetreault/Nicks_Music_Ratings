@@ -133,6 +133,12 @@ def add_format(range, bg, font_color, font_size, bold):
         }
     }
 
+def add_text(range, text):
+    return {
+        "range": range,
+        "values": [[text]]
+    }
+
 # authorizing code to edit my spreadsheets with credentials (hidden)
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
 creds = Credentials.from_service_account_file("C:\\Users\\pickl\\OneDrive\\Desktop\\Nicks_music_ratings\\Credentials.json", scopes=scopes)
@@ -183,27 +189,34 @@ formats.append({
     }
 })
 
-
 # merges for everything idk lol
 merges = []
 
 # merging artist name header
 merges.append(add_merge("B2:O4", "MERGE_ALL", sheetId))
+
 # merging album rankings header
 merges.append(add_merge("Q2:V4", "MERGE_ALL", sheetId))
+
+# merging album rankings album titles
+merges.append(add_merge(f"R{5}:U{6 + len(artist.album_objects)}", "MERGE_ROWS", sheetId))
+
 # merging song rankings header
 merges.append(add_merge(f"Q{pos}:V{pos + 2}", "MERGE_ALL", sheetId))
+
+# merging song rankings song titles
+merges.append(add_merge(f"R{pos + 3}:U{pos + 13}", "MERGE_ROWS", sheetId))
+
 # merging comments header
 merges.append(add_merge(f"Q{pos + 15}:V{pos + 17}", "MERGE_ALL", sheetId))
+
 # merging comments text
 merges.append(add_merge(f"Q{pos + 18}:V{pos + 33}", "MERGE_ALL", sheetId))
 
-text = [ 
-    {
-        "range": "B2:O4",
-        "values": [[artist.artist_name]]
-    }
-]
+
+text = []
+
+text.append(add_text("B2:O4", artist.artist_name))
 
 # Add album formatting and data to batch requests
 
