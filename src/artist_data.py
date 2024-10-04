@@ -72,22 +72,21 @@ class Artist:
         album_objects = []
         
         # creating Album objects with album id's
-        for i in range(len(album_data["items"])):
-            if (" live" in album_data["items"][i]["name"].lower() or "live " in album_data["items"][i]["name"].lower()):
-                continue
-            if (check_bad(album_data["items"][i]["name"])):
-                continue
-            album = Album(self.token, album_data, i)
-            album_objects.append(album)
-        
-        for i in range(len(album_objects) - 1, -1, -1):
-            if (album_objects[i].album_title in album_objects[i - 1].album_title):
-                # deleting repeats
-                # if it takes the wrong album later: change implementation to preserve alb with fewest songs
-                # usually album with fewest songs is the original
-                del album_objects[i - 1]
-                # moving back in array to check if there are multiple duplicates (ex. Opeth)
-                i += 1
+        for i in range(len(album_data["items"]) - 1, -1, -1):
+            if (album_objects):
+                if (album_objects[-1].album_title.lower() in album_data["items"][i]["name"].lower()):
+                    continue
+                # trying to avoid removing albums with "live" in words e.g. "Deliverance"
+                elif (" live" in album_data["items"][i]["name"].lower() or "live " in album_data["items"][i]["name"].lower()):
+                    continue
+                elif (check_bad(album_data["items"][i]["name"])):
+                    continue
+                else:
+                    album = Album(self.token, album_data, i)
+                    album_objects.append(album)
+            else:
+                album = Album(self.token, album_data, i)
+                album_objects.append(album)
 
         self.album_objects = album_objects
 
@@ -168,8 +167,6 @@ artist = Artist(token, "Opeth")
 
 num_albs = len(artist.album_objects)
 
-# print()
-
 # for alb in artist.album_objects:
 #     print(alb.album_title + " " + alb.release_date + "\n")
 #     for i in range(len(alb.song_titles)):
@@ -177,10 +174,3 @@ num_albs = len(artist.album_objects)
 #     print("\n")
 
 # print(num_albs)
-
-# print(f"before: {num_albs}\n")
-# print(f"after: {len(artist.album_objects)}")
-
-# for album in artist.album_objects:
-#     if not album.song_titles or not album.release_date or not album.album_title:
-#         print(f"Album has missing data: {album}")
