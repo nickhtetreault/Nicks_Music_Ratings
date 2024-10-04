@@ -40,60 +40,6 @@ def exponential_backoff(func, *args, max_retries=8, **kwargs):
     # If max retries are exceeded, raise an exception
     raise Exception("Maximum retries exceeded")
 
-def batch_update_album(worksheet, artist):
-    batch_requests = []
-
-    # Starting row for first album
-    pos = 6
-
-    for i in range(len(artist.album_objects) - 1, -1, -1):
-        alb = artist.album_objects[i]
-        alb_num = len(artist.album_objects) - i - 1
-        
-        # Prepare the batch request for album number, release date, title, etc.
-        
-        
-        batch_requests.append({
-            "range": f"C{pos}:C{pos + 1}",
-            "values": [[alb_num + 1], [""]]
-        })
-        batch_requests.append({
-            "range": f"D{pos}:D{pos + 1}",
-            "values": [[alb.release_date], [""]]
-        })
-        batch_requests.append({
-            "range": f"E{pos}:K{pos + 1}",
-            "values": [[alb.album_title], [""]]
-        })
-        batch_requests.append({
-            "range": f"M{pos}:N{pos + 1}",
-            "values": [["Rating"], [""]]
-        })
-        # Track listing for the songs
-        for j in range(len(alb.song_titles)):
-            song_pos = pos + 3 + j
-
-            batch_requests.append({
-                "range": f"E{song_pos}",
-                "values": [[j + 1]]
-            })
-
-            batch_requests.append({
-                "range": f"F{song_pos}",
-                "values": [[alb.song_titles[j]]]
-            })
-
-            batch_requests.append({
-                "range": f"J{song_pos}",
-                "values": [[alb.song_lens[j]]]
-            })
-
-        # Update row position for next album
-        pos += 4 + len(alb.song_titles)
-
-    # Execute the batch update with a single API call
-    exponential_backoff(worksheet.batch_update, batch_requests)
-
 def add_merge(range, merge_type, sheetId):
     convert_range = gspread.utils.a1_range_to_grid_range(range)
     return {
@@ -150,16 +96,13 @@ sh = client.open_by_key(spreadsheet_id)
 
 # Get artist data
 token = get_token()
-artist = Artist(token, "The Dillinger Escape Plan")
+artist = Artist(token, "Opeth")
 # create worksheet later once testing is done
 worksheet = sh.worksheet(artist.artist_name)
 
 sheetId = worksheet._properties['sheetId']
 
 worksheet.hide_gridlines()
-
-# batch_update_album(worksheet, artist)
-
 
 # Format requests for Artist name, album rankings, song rankings, comments
 formats = []
@@ -189,7 +132,7 @@ formats.append({
     }
 })
 
-# merges for everything idk lol
+# Keeping track of all merges
 merges = []
 
 # merging artist name header
@@ -266,7 +209,7 @@ for i, alb in enumerate(artist.album_objects):
     formats.append(add_format(f"E{album_pos}:K{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
 
     formats.append(add_format(f"M{album_pos}:N{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
-    formats.append(add_format(f"M{album_pos + 2}:N{album_pos + 3}", "bg", "Black", 25, True))
+    formats.append(add_format(f"M{album_pos + 2}:N{album_pos + 3}", "bg", "Black", 20, False))
 
     formats.append(add_format(f"E{album_pos + 2}:K{album_pos + 2}", "bg", "Purple_3", 10, True))
 
@@ -295,6 +238,9 @@ for i, alb in enumerate(artist.album_objects):
 
     album_pos += len(alb.song_titles) + 4
 
+# Making write requests w/ lists of instructions
+
+# Might have to call w/ exponential backoff if JSONDecodeError comes back
 
 worksheet.batch_format(formats)
 
