@@ -62,7 +62,6 @@ def check_bad(title):
         "reissue",
         "unfinished",
         "deluxe",
-        "special edition"
     ]
     for b in bad:
         if (b in title.lower()):

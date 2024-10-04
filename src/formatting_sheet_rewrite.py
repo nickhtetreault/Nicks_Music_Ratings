@@ -234,21 +234,35 @@ text.append(add_text(f"Q{pos + 3}", "#"))
 text.append(add_text(f"R{pos + 3}:U{pos + 3}", "Title"))
 text.append(add_text(f"V{pos + 3}", "Rating"))
 
+# Adding numbers 1-10 for top songs
 for i in range(10):
     text.append(add_text(f"Q{pos + 4 + i}", i + 1))
 
 text.append(add_text(f"Q{pos + 15}:V{pos + 17}", "Comments"))
 
-# Add album formatting and data to batch requests
+# Adding album data, formatting, merges for each album
+
+album_pos = 6
+
+for i in range(len(artist.album_objects)):
+    # Merge requests
+    # Album number
+    merges.append(add_merge(f"C{pos}:C{pos + 1}"), "MERGE_ALL", sheetId)
+    # Release date
+    merges.append(add_merge(f"D{pos}:D{pos + 1}"), "MERGE_ALL", sheetId)
+    # Album title
+    merges.append(add_merge(f"E{pos}:K{pos + 1}"), "MERGE_ALL", sheetId)
+    # Rating
+    merges.append(add_merge(f"M{pos}:N{pos + 1}"), "MERGE_ALL", sheetId)
+    # Song titles
+    merges.append(add_merge(f"F{pos + 2}:I{pos + len(artist.album_objects[i].song_titles) + 1}"), "MERGE_ROWS", sheetId)
 
 worksheet.batch_format(formats)
 
-body = {
+merge = {
     "requests": merges
 }
 
-# worksheet.batch_update(merges)
-
-sh.batch_update(body)
+sh.batch_update(merge)
 
 worksheet.batch_update(text)
