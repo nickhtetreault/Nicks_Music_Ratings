@@ -8,7 +8,9 @@ Spreadsheet maintained by the code in this repository [here](https://docs.google
 
 - [x] Access spreadsheet
 - [x] Format artist albums
+    - [X] Re-implement as batch updates
 - [x] Format arist non-album section
+    - [X] Re-implement as batch updates
 - [x] Design new "home" page
     - [x] Embed link to generated spreadsheet in cell
 - [ ] Make spreadsheets update upon new releases (w/o overwriting)
