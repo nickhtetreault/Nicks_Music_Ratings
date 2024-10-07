@@ -62,6 +62,7 @@ def check_bad(title):
         "reissue",
         "unfinished",
         "deluxe",
+        "instrumental"
     ]
     for b in bad:
         if (b in title.lower()):
