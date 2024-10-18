@@ -94,160 +94,157 @@ client = gspread.authorize(creds)
 spreadsheet_id = "1Jc7roe2tmtVx-0hdn6DPI2zDh6NcPyWLBMVZN20a5WM"
 sh = client.open_by_key(spreadsheet_id)
 
-# Get artist data
-token = get_token()
-artist = Artist(token, "Opeth")
-# create worksheet later once testing is done
-worksheet = sh.worksheet(artist.artist_name)
+def generate_spreadsheet(name):
+    # Get artist data
+    print(f"accessed function with input {name}")
+    token = get_token()
+    artist = Artist(token, name)
 
-sheetId = worksheet._properties['sheetId']
+    # create worksheet later once testing is done
+    worksheet = sh.add_worksheet(title=name, rows=500, cols=23)
+    # worksheet = sh.worksheet(artist.artist_name)
+    sheetId = worksheet._properties['sheetId']
 
-worksheet.hide_gridlines()
+    worksheet.hide_gridlines()
 
-# Format requests for Artist name, album rankings, song rankings, comments
-formats = []
+    # Format requests for Artist name, album rankings, song rankings, comments
+    formats = []
 
-# Formatting all cells (essentially background)
-formats.append(add_format("A1:W500", "bg", "Black", 10, False))
-# Artist name header
-formats.append(add_format("B2:O4", "Gray_1", "Purple_1", 38, True))
-# Album ratings header
-formats.append(add_format("Q2:V4", "Gray_1", "Purple_1", 38, True))
-# Album ratings data labels
-formats.append(add_format("Q5:V5", "bg", "Purple_3", 10, True))
-# Song ratings header
-pos = 7 + len(artist.album_objects) # placing based on number of albums
-formats.append(add_format(f"Q{pos}:V{pos + 2}", "Gray_1", "Purple_1", 38, True))
-# Song ratings data labels
-formats.append(add_format(f"Q{pos + 3}:V{pos + 3}", "bg", "Purple_3", 10, True))
-# Comments header
-formats.append(add_format(f"Q{pos + 15}:V{pos + 17}", "Gray_1", "Purple_1", 38, True))
-# Comments text formatting
-formats.append({
-    "range": f"Q{pos + 18}:V{pos + 33}",
-    "format": {
-        "horizontalAlignment": "LEFT",
-        "verticalAlignment" : "TOP",
-        "wrapStrategy": "WRAP"
+    # Formatting all cells (essentially background)
+    formats.append(add_format("A1:W500", "bg", "Black", 10, False))
+    # Artist name header
+    formats.append(add_format("B2:O4", "Gray_1", "Purple_1", 38, True))
+    # Album ratings header
+    formats.append(add_format("Q2:V4", "Gray_1", "Purple_1", 38, True))
+    # Album ratings data labels
+    formats.append(add_format("Q5:V5", "bg", "Purple_3", 10, True))
+    # Song ratings header
+    pos = 7 + len(artist.album_objects) # placing based on number of albums
+    formats.append(add_format(f"Q{pos}:V{pos + 2}", "Gray_1", "Purple_1", 38, True))
+    # Song ratings data labels
+    formats.append(add_format(f"Q{pos + 3}:V{pos + 3}", "bg", "Purple_3", 10, True))
+    # Comments header
+    formats.append(add_format(f"Q{pos + 15}:V{pos + 17}", "Gray_1", "Purple_1", 38, True))
+    # Comments text formatting
+    formats.append({
+        "range": f"Q{pos + 18}:V{pos + 33}",
+        "format": {
+            "horizontalAlignment": "LEFT",
+            "verticalAlignment" : "TOP",
+            "wrapStrategy": "WRAP"
+        }
+    })
+
+    # Keeping track of all merges
+    merges = []
+
+    # merging artist name header
+    merges.append(add_merge("B2:O4", "MERGE_ALL", sheetId))
+
+    # merging album rankings header
+    merges.append(add_merge("Q2:V4", "MERGE_ALL", sheetId))
+
+    # merging album rankings album titles
+    merges.append(add_merge(f"R{5}:U{6 + len(artist.album_objects)}", "MERGE_ROWS", sheetId))
+
+    # merging song rankings header
+    merges.append(add_merge(f"Q{pos}:V{pos + 2}", "MERGE_ALL", sheetId))
+
+    # merging song rankings song titles
+    merges.append(add_merge(f"R{pos + 3}:U{pos + 13}", "MERGE_ROWS", sheetId))
+
+    # merging comments header
+    merges.append(add_merge(f"Q{pos + 15}:V{pos + 17}", "MERGE_ALL", sheetId))
+
+    # merging comments text
+    merges.append(add_merge(f"Q{pos + 18}:V{pos + 33}", "MERGE_ALL", sheetId))
+
+    # Text to write to spreadsheet
+    text = []
+
+    text.append(add_text("B2:O4", artist.artist_name))
+
+    # Album ratings
+    text.append(add_text("Q2:V4", "Album Rankings"))
+    text.append(add_text("Q5", "#"))
+    text.append(add_text("R5:U5", "Title"))
+    text.append(add_text("V5", "Rating"))
+
+    # Adding numbers 1 up to number of albums
+    for i in range(len(artist.album_objects)):
+        text.append(add_text(f"Q{6 + i}", i + 1))
+
+    # Song ratings
+    text.append(add_text(f"Q{pos}:V{pos + 2}", "Top 10 Songs"))
+    text.append(add_text(f"Q{pos + 3}", "#"))
+    text.append(add_text(f"R{pos + 3}:U{pos + 3}", "Title"))
+    text.append(add_text(f"V{pos + 3}", "Rating"))
+
+    # Adding numbers 1-10 for top songs
+    for i in range(10):
+        text.append(add_text(f"Q{pos + 4 + i}", i + 1))
+
+    text.append(add_text(f"Q{pos + 15}:V{pos + 17}", "Comments"))
+
+    # Adding album data, formatting, merges for each album
+
+    album_pos = 6
+
+    for i, alb in enumerate(artist.album_objects):
+        # Merge requests
+        # Album number
+        merges.append(add_merge(f"C{album_pos}:C{album_pos + 1}", "MERGE_ALL", sheetId))
+        # Release date
+        merges.append(add_merge(f"D{album_pos}:D{album_pos + 1}", "MERGE_ALL", sheetId))
+        # Album title
+        merges.append(add_merge(f"E{album_pos}:K{album_pos + 1}", "MERGE_ALL", sheetId))
+        # Rating
+        merges.append(add_merge(f"M{album_pos}:N{album_pos + 1}", "MERGE_ALL", sheetId))
+        merges.append(add_merge(f"M{album_pos + 2}:N{album_pos + 3}", "MERGE_ALL", sheetId))
+        # Song titles
+        merges.append(add_merge(f"F{album_pos + 2}:I{album_pos + len(alb.song_titles) + 2}", "MERGE_ROWS", sheetId))
+
+        # Format requests
+        formats.append(add_format(f"C{album_pos}:C{album_pos + 1}", "Gray_1", "Purple_1", 25, True))
+        formats.append(add_format(f"D{album_pos}:D{album_pos + 1}", "Gray_2", "Blue", 25, True))
+        formats.append(add_format(f"E{album_pos}:K{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
+        formats.append(add_format(f"M{album_pos}:N{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
+        formats.append(add_format(f"M{album_pos + 2}:N{album_pos + 3}", "bg", "Black", 20, False))
+        formats.append(add_format(f"E{album_pos + 2}:K{album_pos + 2}", "bg", "Purple_3", 10, True))
+
+        # Write attempts
+        text.append(add_text(f"C{album_pos}", i + 1))
+        text.append(add_text(f"D{album_pos}", alb.release_date))
+        text.append(add_text(f"E{album_pos}", alb.album_title))
+        text.append(add_text(f"M{album_pos}", "Rating"))
+        text.append(add_text(f"E{album_pos + 2}", "#"))
+        text.append(add_text(f"F{album_pos + 2}", "Title"))
+        text.append(add_text(f"J{album_pos + 2}", "Length"))
+        text.append(add_text(f"K{album_pos + 2}", "Rating"))
+
+        for j in range(len(alb.song_titles)):
+            text.append(add_text(f"E{album_pos + 3 + j}", j + 1))
+            text.append(add_text(f"F{album_pos + 3 + j}", alb.song_titles[j]))
+            text.append(add_text(f"J{album_pos + 3 + j}", alb.song_lens[j]))
+
+        album_pos += len(alb.song_titles) + 4
+
+    # Making write requests w/ lists of instructions
+
+    # Might have to call w/ exponential backoff if JSONDecodeError comes back
+
+    worksheet.batch_format(formats)
+
+    merge = {
+        "requests": merges
     }
-})
 
-# Keeping track of all merges
-merges = []
+    sh.batch_update(merge)
 
-# merging artist name header
-merges.append(add_merge("B2:O4", "MERGE_ALL", sheetId))
+    worksheet.batch_update(text)
 
-# merging album rankings header
-merges.append(add_merge("Q2:V4", "MERGE_ALL", sheetId))
-
-# merging album rankings album titles
-merges.append(add_merge(f"R{5}:U{6 + len(artist.album_objects)}", "MERGE_ROWS", sheetId))
-
-# merging song rankings header
-merges.append(add_merge(f"Q{pos}:V{pos + 2}", "MERGE_ALL", sheetId))
-
-# merging song rankings song titles
-merges.append(add_merge(f"R{pos + 3}:U{pos + 13}", "MERGE_ROWS", sheetId))
-
-# merging comments header
-merges.append(add_merge(f"Q{pos + 15}:V{pos + 17}", "MERGE_ALL", sheetId))
-
-# merging comments text
-merges.append(add_merge(f"Q{pos + 18}:V{pos + 33}", "MERGE_ALL", sheetId))
-
-# Text to write to spreadsheet
-text = []
-
-text.append(add_text("B2:O4", artist.artist_name))
-
-# Album ratings
-text.append(add_text("Q2:V4", "Album Rankings"))
-text.append(add_text("Q5", "#"))
-text.append(add_text("R5:U5", "Title"))
-text.append(add_text("V5", "Rating"))
-
-# Adding numbers 1 up to number of albums
-for i in range(len(artist.album_objects)):
-    text.append(add_text(f"Q{6 + i}", i + 1))
-
-# Song ratings
-text.append(add_text(f"Q{pos}:V{pos + 2}", "Top 10 Songs"))
-text.append(add_text(f"Q{pos + 3}", "#"))
-text.append(add_text(f"R{pos + 3}:U{pos + 3}", "Title"))
-text.append(add_text(f"V{pos + 3}", "Rating"))
-
-# Adding numbers 1-10 for top songs
-for i in range(10):
-    text.append(add_text(f"Q{pos + 4 + i}", i + 1))
-
-text.append(add_text(f"Q{pos + 15}:V{pos + 17}", "Comments"))
-
-# Adding album data, formatting, merges for each album
-
-album_pos = 6
-
-for i, alb in enumerate(artist.album_objects):
-    # Merge requests
-    # Album number
-    merges.append(add_merge(f"C{album_pos}:C{album_pos + 1}", "MERGE_ALL", sheetId))
-    # Release date
-    merges.append(add_merge(f"D{album_pos}:D{album_pos + 1}", "MERGE_ALL", sheetId))
-    # Album title
-    merges.append(add_merge(f"E{album_pos}:K{album_pos + 1}", "MERGE_ALL", sheetId))
-    # Rating
-    merges.append(add_merge(f"M{album_pos}:N{album_pos + 1}", "MERGE_ALL", sheetId))
-    merges.append(add_merge(f"M{album_pos + 2}:N{album_pos + 3}", "MERGE_ALL", sheetId))
-    # Song titles
-    merges.append(add_merge(f"F{album_pos + 2}:I{album_pos + len(alb.song_titles) + 2}", "MERGE_ROWS", sheetId))
-
-    # Format requests
-    formats.append(add_format(f"C{album_pos}:C{album_pos + 1}", "Gray_1", "Purple_1", 25, True))
-
-    formats.append(add_format(f"D{album_pos}:D{album_pos + 1}", "Gray_2", "Blue", 25, True))
-
-    formats.append(add_format(f"E{album_pos}:K{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
-
-    formats.append(add_format(f"M{album_pos}:N{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
-    formats.append(add_format(f"M{album_pos + 2}:N{album_pos + 3}", "bg", "Black", 20, False))
-
-    formats.append(add_format(f"E{album_pos + 2}:K{album_pos + 2}", "bg", "Purple_3", 10, True))
-
-    # Write attempts
-    text.append(add_text(f"C{album_pos}", i + 1))
-
-    text.append(add_text(f"D{album_pos}", alb.release_date))
-
-    text.append(add_text(f"E{album_pos}", alb.album_title))
-
-    text.append(add_text(f"M{album_pos}", "Rating"))
-
-    text.append(add_text(f"E{album_pos + 2}", "#"))
-
-    text.append(add_text(f"F{album_pos + 2}", "Title"))
-
-    text.append(add_text(f"J{album_pos + 2}", "Length"))
-
-    text.append(add_text(f"K{album_pos + 2}", "Rating"))
-
-
-    for j in range(len(alb.song_titles)):
-        text.append(add_text(f"E{album_pos + 3 + j}", j + 1))
-        text.append(add_text(f"F{album_pos + 3 + j}", alb.song_titles[j]))
-        text.append(add_text(f"J{album_pos + 3 + j}", alb.song_lens[j]))
-
-    album_pos += len(alb.song_titles) + 4
-
-# Making write requests w/ lists of instructions
-
-# Might have to call w/ exponential backoff if JSONDecodeError comes back
-
-worksheet.batch_format(formats)
-
-merge = {
-    "requests": merges
-}
-
-sh.batch_update(merge)
-
-worksheet.batch_update(text)
+# generate_spreadsheet("Dream Theater")
+# print("triggered batch_formatting_sheet script, not function")
+if __name__ == "__main__":
+    print("triggered batch_formatting_sheet script, not function")
+# generate_spreadsheet("The Dillinger Escape Plan")
