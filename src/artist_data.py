@@ -161,11 +161,11 @@ class Album:
 
 # \/\/\/ TEST CODE \/\/\/
 
-token = get_token()
+# token = get_token()
 
-artist = Artist(token, "Opeth")
+# artist = Artist(token, "Opeth")
 
-num_albs = len(artist.album_objects)
+# num_albs = len(artist.album_objects)
 
 # for alb in artist.album_objects:
 #     print(alb.album_title + " " + alb.release_date + "\n")
