@@ -14,10 +14,12 @@ Spreadsheet maintained by the code in this repository [here](https://docs.google
 - [x] Design new "home" page
     - [x] Embed link to generated spreadsheet in cell
 - [ ] Make spreadsheets update upon new releases (w/o overwriting)
-    - [ ] Deploy web hook on cloud to accomplish
-- [ ] Generate new sheets when band name added to list
+- [x] Generate new sheets when band name added to list
+    - [x] Use ngrok for temporary hosting
+- [ ] Deploy web hook on cloud for future use
+- [ ] Add google app scripts to repository
 - [ ] Trigger python scripts when specific cells update
-    - [ ] Create new sheet for artist entered on List of Artists sheet
+    - [x] Create new sheet for artist entered on List of Artists sheet
     - [ ] Bold + color change highest rated song on album
     - [ ] Update top 10 songs
     - [ ] update album rankings
