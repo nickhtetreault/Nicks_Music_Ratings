@@ -96,12 +96,14 @@ sh = client.open_by_key(spreadsheet_id)
 
 def generate_spreadsheet(name):
     # Get artist data
-    print(f"accessed function with input {name}")
-    token = get_token()
-    artist = Artist(token, name)
+    try: 
+        artist = Artist(name)
+    except Exception as e:
+        raise Exception(e)
 
     # create worksheet later once testing is done
-    worksheet = sh.add_worksheet(title=name, rows=500, cols=23)
+    worksheet = sh.add_worksheet(title=name, rows=1000, cols=23)
+
     # worksheet = sh.worksheet(artist.artist_name)
     sheetId = worksheet._properties['sheetId']
 
@@ -111,20 +113,27 @@ def generate_spreadsheet(name):
     formats = []
 
     # Formatting all cells (essentially background)
-    formats.append(add_format("A1:W500", "bg", "Black", 10, False))
+    formats.append(add_format("A1:W1000", "bg", "Black", 10, False))
+
     # Artist name header
     formats.append(add_format("B2:O4", "Gray_1", "Purple_1", 38, True))
+
     # Album ratings header
     formats.append(add_format("Q2:V4", "Gray_1", "Purple_1", 38, True))
+
     # Album ratings data labels
     formats.append(add_format("Q5:V5", "bg", "Purple_3", 10, True))
+
     # Song ratings header
     pos = 7 + len(artist.album_objects) # placing based on number of albums
     formats.append(add_format(f"Q{pos}:V{pos + 2}", "Gray_1", "Purple_1", 38, True))
+
     # Song ratings data labels
     formats.append(add_format(f"Q{pos + 3}:V{pos + 3}", "bg", "Purple_3", 10, True))
+
     # Comments header
     formats.append(add_format(f"Q{pos + 15}:V{pos + 17}", "Gray_1", "Purple_1", 38, True))
+
     # Comments text formatting
     formats.append({
         "range": f"Q{pos + 18}:V{pos + 33}",
@@ -194,13 +203,17 @@ def generate_spreadsheet(name):
         # Merge requests
         # Album number
         merges.append(add_merge(f"C{album_pos}:C{album_pos + 1}", "MERGE_ALL", sheetId))
+
         # Release date
         merges.append(add_merge(f"D{album_pos}:D{album_pos + 1}", "MERGE_ALL", sheetId))
+
         # Album title
         merges.append(add_merge(f"E{album_pos}:K{album_pos + 1}", "MERGE_ALL", sheetId))
+
         # Rating
         merges.append(add_merge(f"M{album_pos}:N{album_pos + 1}", "MERGE_ALL", sheetId))
         merges.append(add_merge(f"M{album_pos + 2}:N{album_pos + 3}", "MERGE_ALL", sheetId))
+        
         # Song titles
         merges.append(add_merge(f"F{album_pos + 2}:I{album_pos + len(alb.song_titles) + 2}", "MERGE_ROWS", sheetId))
 
