@@ -32,13 +32,13 @@ def get_auth_header(token):
 # object containing all data to be put into spreadsheet
 # also has variables that will be updated by input in spreadsheet
 class Artist:
-    def __init__(self, token, artist_name):
-        self.token = token
+    def __init__(self, artist_name):
+        self.token = get_token()
         self.artist_name = artist_name
 
         # structuring request & finding artist_id
         url = "https://api.spotify.com/v1/search"
-        headers = get_auth_header(token)
+        headers = get_auth_header(self.token)
         query = f"?q={artist_name}&type=artist&limit=1"
         query_url = url + query
         result = get(query_url, headers=headers)
@@ -47,17 +47,14 @@ class Artist:
 
         # checking that artist with given name exists
         if len(json_result) == 0:
-            print("No artist found with this name")
-            return None
+            raise Exception("No artist found with this name")
         
         if (json_result[0]["name"] != artist_name):
             name = json_result[0]["name"]
-            print (f"Expected {artist_name} but found {name}")
-            return None
+            raise Exception(f"Expected {artist_name} but found {name}")
         
         self.artist_id = json_result[0]["id"]
 
-        # calling get_albums, breaking up the functions so I don't have to put everything in init
         self.get_albums()
     
     def get_albums(self):
@@ -72,14 +69,14 @@ class Artist:
         album_objects = []
         
         # creating Album objects with album id's
-        for i in range(len(album_data["items"]) - 1, -1, -1):
-            if (album_objects):
-                if (album_objects[-1].album_title.lower() in album_data["items"][i]["name"].lower()):
+        num_albs = len(album_data["items"])
+        for i in range(num_albs - 1, -1, -1):
+            if album_objects:
+                # checking if repeat of last album appended to list (imperfect)
+                if album_objects[-1].album_title.lower() in album_data["items"][i]["name"].lower():
                     continue
-                # trying to avoid removing albums with "live" in words e.g. "Deliverance"
-                elif (" live" in album_data["items"][i]["name"].lower() or "live " in album_data["items"][i]["name"].lower()):
-                    continue
-                elif (check_bad(album_data["items"][i]["name"])):
+                # checking for non-studio albums
+                elif check_bad(album_data["items"][i]["name"].lower()):
                     continue
                 else:
                     album = Album(self.token, album_data, i)
@@ -100,7 +97,7 @@ class Album:
 
         # deriving vars from album_data
         self.album_id = album_data["items"][album_num]["id"]
-        self.release_date = album_data["items"][album_num]["release_date"][0:4]
+        self.release_date = album_data["items"][album_num]["release_date"][0:4] # getting year only
         self.album_title = clean_alb_title(album_data["items"][album_num]["name"], self.release_date)
         self.cover = album_data["items"][album_num]["images"][0]["url"]
         self.get_song_data()
@@ -161,16 +158,18 @@ class Album:
 
 # \/\/\/ TEST CODE \/\/\/
 
-# token = get_token()
 
-# artist = Artist(token, "Opeth")
+# try: 
+#     artist = Artist("Opeth")
+# except Exception as e:
+#     print(f"Error: {str(e)}")
 
 # num_albs = len(artist.album_objects)
 
-# for alb in artist.album_objects:
-#     print(alb.album_title + " " + alb.release_date + "\n")
-#     for i in range(len(alb.song_titles)):
-#         print(alb.song_titles[i] + " " + alb.song_lens[i])
+# for i, alb in enumerate(artist.album_objects):
+#     print(f"{i + 1} {alb.album_title} {alb.release_date} \n")
+#     # for i in range(len(alb.song_titles)):
+#     #     print(alb.song_titles[i] + " " + alb.song_lens[i])
 #     print("\n")
 
 # print(num_albs)
