@@ -5,3 +5,5 @@ venv/
 __pycache__/
 
 .env
+
+src\formatting_sheet.py
