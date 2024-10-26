@@ -208,7 +208,10 @@ def generate_spreadsheet(name):
         merges.append(add_merge(f"D{album_pos}:D{album_pos + 1}", "MERGE_ALL", sheetId))
 
         # Album title
-        merges.append(add_merge(f"E{album_pos}:K{album_pos + 1}", "MERGE_ALL", sheetId))
+        merges.append(add_merge(f"E{album_pos}:J{album_pos + 1}", "MERGE_ALL", sheetId))
+
+        # Album length
+        merges.append(add_merge(f"K{album_pos}:K{album_pos + 1}", "MERGE_ALL", sheetId))
 
         # Rating
         merges.append(add_merge(f"M{album_pos}:N{album_pos + 1}", "MERGE_ALL", sheetId))
@@ -220,7 +223,8 @@ def generate_spreadsheet(name):
         # Format requests
         formats.append(add_format(f"C{album_pos}:C{album_pos + 1}", "Gray_1", "Purple_1", 25, True))
         formats.append(add_format(f"D{album_pos}:D{album_pos + 1}", "Gray_2", "Blue", 25, True))
-        formats.append(add_format(f"E{album_pos}:K{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
+        formats.append(add_format(f"E{album_pos}:J{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
+        formats.append(add_format(f"K{album_pos}:K{album_pos + 1}", "Gray_2", "Blue", 18, True))
         formats.append(add_format(f"M{album_pos}:N{album_pos + 1}", "Gray_3", "Purple_2", 25, True))
         formats.append(add_format(f"M{album_pos + 2}:N{album_pos + 3}", "bg", "Black", 20, False))
         formats.append(add_format(f"E{album_pos + 2}:K{album_pos + 2}", "bg", "Purple_3", 10, True))
@@ -229,6 +233,7 @@ def generate_spreadsheet(name):
         text.append(add_text(f"C{album_pos}", i + 1))
         text.append(add_text(f"D{album_pos}", alb.release_date))
         text.append(add_text(f"E{album_pos}", alb.album_title))
+        text.append(add_text(f"K{album_pos}", alb.album_len))
         text.append(add_text(f"M{album_pos}", "Rating"))
         text.append(add_text(f"E{album_pos + 2}", "#"))
         text.append(add_text(f"F{album_pos + 2}", "Title"))
