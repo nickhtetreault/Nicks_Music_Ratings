@@ -50,6 +50,9 @@ where a new request to filter the artist data will call a different filter proto
 def check_bad(title):
     bad = [
         "best of",
+        "(live)"
+        " live",
+        "live ",
         "presents",
         "compilation",
         "greatest hits",
@@ -61,8 +64,8 @@ def check_bad(title):
         "tapes",
         "reissue",
         "unfinished",
-        "deluxe",
-        "instrumental"
+        "instrumental",
+        "cover"
     ]
     for b in bad:
         if (b in title.lower()):
@@ -83,6 +86,8 @@ def clean_alb_title(title, release):
         "Remastered",
         "(Remaster)",
         "Remaster",
+        "(Deluxe",
+        "Deluxe"
     ]
     for r in remove:
         pos = title.find(r)
@@ -92,17 +97,21 @@ def clean_alb_title(title, release):
 
 def clean_song_title(title):
     remove = [
-        "(Remastered)",
-        "(Remaster)",
-        "(Special Edition)",
-        " - Remastered",
-        " - Remaster",
-        "Special Edition",
-        "Remastered",
-        "Remaster"
+        "(remastered)",
+        "(remaster)",
+        "(special edition)",
+        " - remastered",
+        " - remaster",
+        "special edition",
+        "remastered",
+        "remaster",
+        "(bonus track)",
+        "bonus track",
+        "(bonus)",
+        "bonus"
     ]
     for r in remove:
-        pos = title.find(r)
+        pos = title.lower().find(r)
         if (pos > -1):
             return title[:pos].strip()
     return title
