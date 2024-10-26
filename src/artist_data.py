@@ -124,6 +124,8 @@ class Album:
         for s in song_data["items"]:
             if " live" in s["name"].lower() or "(live)" in s["name"].lower():
                 continue
+            elif "cover" in s["name"].lower():
+                continue
             song = clean_song_title(s["name"])
             song_titles.append(song)
             song_ids.append(s["id"])
@@ -136,7 +138,7 @@ class Album:
         self.song_lens = song_lens
         self.album_len = self.millis_to_mins(album_len)
 
-    # converting song lengths to more readable mins:seconds (ex. 4:23, 2:06, 10:04, etc.)
+    # converting lengths of songs & albs to more readable hours:mins:seconds (ex. 1:04:23, 2:06, 10:04, etc.)
     def millis_to_mins(self, millis):
         # if song is shorter than one hour (99.999999% of cases)
         if (millis < 3600000):
@@ -153,7 +155,7 @@ class Album:
                 seconds = "0" + str(seconds)
             if (minutes < 10):
                 minutes = "0" + str(minutes)
-            return f"{minutes}:{seconds}:{hours}"
+            return f"{hours}:{minutes}:{seconds}"
 
 
 # \/\/\/ TEST CODE \/\/\/
@@ -166,10 +168,12 @@ class Album:
 
 # num_albs = len(artist.album_objects)
 
+# artist = Artist("Opeth")
+
 # for i, alb in enumerate(artist.album_objects):
-#     print(f"{i + 1} {alb.album_title} {alb.release_date} \n")
-#     # for i in range(len(alb.song_titles)):
-#     #     print(alb.song_titles[i] + " " + alb.song_lens[i])
+#     print(f"{i + 1} {alb.album_title} {alb.release_date} {alb.album_len} \n")
+#     for i in range(len(alb.song_titles)):
+#         print(alb.song_titles[i] + " " + alb.song_lens[i])
 #     print("\n")
 
 # print(num_albs)
