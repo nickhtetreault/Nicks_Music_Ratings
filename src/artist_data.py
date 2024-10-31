@@ -3,7 +3,9 @@ import os
 import base64
 from requests import post, get
 import json
+import re
 from filter_items import *
+from discogs_filter import *
 
 load_dotenv()
 
@@ -30,7 +32,7 @@ def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
 
 # object containing all data to be put into spreadsheet
-# also has variables that will be updated by input in spreadsheet
+# also has variables that will be updated by input in spreadsheet (soon™)
 class Artist:
     def __init__(self, artist_name):
         self.token = get_token()
@@ -65,28 +67,45 @@ class Artist:
 
         # parsing json content to make data easier to access
         album_data = json.loads(result.content)
-
-        album_objects = []
         
         # creating Album objects with album id's
         num_albs = len(album_data["items"])
+
+        album_titles = []
         for i in range(num_albs - 1, -1, -1):
-            if album_objects:
+            if album_titles:
                 # checking if repeat of last album appended to list (imperfect)
-                if album_objects[-1].album_title.lower() in album_data["items"][i]["name"].lower():
-                    continue
-                # checking for non-studio albums
-                elif check_bad(album_data["items"][i]["name"].lower()):
+                if album_titles[-1][0].lower() in album_data["items"][i]["name"].lower() or album_data["items"][i]["name"].lower() in album_titles[-1][0].lower():
+                    # checking to see if title is shorter than previous title, meaning it's likely the original verison (the one I want)
+                    if len(album_data["items"][i]["name"].lower()) < len(album_titles[-1][0].lower()):
+                        album_titles[-1] = (album_data["items"][i]["name"], i)
+                    else:
+                        continue
+                elif check_bad(album_data["items"][i]["name"]):
                     continue
                 else:
-                    album = Album(self.token, album_data, i)
-                    album_objects.append(album)
+                    album_titles.append((album_data["items"][i]["name"].strip(), i))
             else:
-                album = Album(self.token, album_data, i)
-                album_objects.append(album)
+                album_titles.append((album_data["items"][i]["name"].strip(), i))
+        
+        studio_albs = get_studio_albums(self.artist_name)
+   
+
+        # I know this is like O(n^2) but the lists aren't gonna be that long and it seems overkill to implement
+        # some algo to more efficiently search for similar strings in faster time
+        # I would be inclined to try alb numer or release year but I'm worried about discrepencies between
+        # Spoify API data and discogs data (more likely to break imo)
+        album_objects = []
+        for title, alb_num in album_titles:
+            for studio_title in studio_albs:
+                # removing punctuation, sometimes discrepency between spot & discogs (ex. Dream Theater)
+                spot_title = re.sub(r'[^\w\s]', '', title.lower())
+                discogs_title = re.sub(r'[^\w\s]', '', studio_title.lower())
+                if spot_title in discogs_title or discogs_title in spot_title:
+                    album_objects.append(Album(self.token, album_data, alb_num))
+                    studio_albs.remove(studio_title)
 
         self.album_objects = album_objects
-
 
 # object containing all data from an album from spotify
 # also has variables that will be updated by input in spreadsheet
@@ -99,6 +118,7 @@ class Album:
         self.album_id = album_data["items"][album_num]["id"]
         self.release_date = album_data["items"][album_num]["release_date"][0:4] # getting year only
         self.album_title = clean_alb_title(album_data["items"][album_num]["name"], self.release_date)
+        # self.album_title = real_title
         self.cover = album_data["items"][album_num]["images"][0]["url"]
         self.get_song_data()
 
@@ -160,7 +180,6 @@ class Album:
 
 # \/\/\/ TEST CODE \/\/\/
 
-
 # try: 
 #     artist = Artist("Opeth")
 # except Exception as e:
@@ -168,10 +187,10 @@ class Album:
 
 # num_albs = len(artist.album_objects)
 
-# artist = Artist("Opeth")
+# artist = Artist("Dream Theater")
 
 # for i, alb in enumerate(artist.album_objects):
-#     print(f"{i + 1} {alb.album_title} {alb.release_date} {alb.album_len} \n")
+#     print(f"{i + 1} {alb.album_title} {alb.release_date} {alb.album_len}")
 #     for i in range(len(alb.song_titles)):
 #         print(alb.song_titles[i] + " " + alb.song_lens[i])
 #     print("\n")
