@@ -12,10 +12,9 @@ headers = {
     'User-Agent': 'music_ratings'
 }
 
-def get_studio_albums(artist_id):
-    response = requests.get(f"{BASE_URL}/database/search?type=master&&sort=year&artist={artist_id}&role=main&format=album", headers=headers)
+def get_studio_albums(artist_name):
+    response = requests.get(f"{BASE_URL}/database/search?type=master&&sort=year&artist={artist_name}&role=main&format=album", headers=headers)
     releases = response.json()
-    print(releases)
     count = 0
     albs = []
     for item in releases.get("results", []):
@@ -24,10 +23,4 @@ def get_studio_albums(artist_id):
             title = item.get("title", []).split("-")[1].strip()
             albs.append(title)
             count += 1
-    print(count)
     return albs
-
-albs = get_studio_albums("The Beatles")
-
-for a in albs:
-    print(a)
