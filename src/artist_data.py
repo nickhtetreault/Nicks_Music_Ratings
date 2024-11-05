@@ -102,7 +102,9 @@ class Artist:
                 spot_title = re.sub(r'[^\w\s]', '', title.lower())
                 discogs_title = re.sub(r'[^\w\s]', '', studio_title.lower())
                 if spot_title in discogs_title or discogs_title in spot_title:
-                    album_objects.append(Album(self.token, album_data, alb_num))
+                    alb = Album(self.token, album_data, alb_num)
+                    if (alb.album_len != "0:00"):
+                        album_objects.append(alb)
                     studio_albs.remove(studio_title)
 
         self.album_objects = album_objects
@@ -145,6 +147,8 @@ class Album:
             if " live" in s["name"].lower() or "(live)" in s["name"].lower():
                 continue
             elif "cover" in s["name"].lower():
+                continue
+            elif " demo" in s["name"].lower() or "(demo)" in s["name"].lower():
                 continue
             song = clean_song_title(s["name"])
             song_titles.append(song)
