@@ -17,7 +17,8 @@ Colors = {
     "Purple_2": [142 / 255.0, 124 / 255.0, 195 / 255.0],
     "Purple_3": [180 / 255.0, 167 / 255.0, 214 / 255.0],
     "Blue": [61 / 255.0, 133 / 255.0, 198 / 255.0],
-    "Black": [0, 0, 0]
+    "Black": [0, 0, 0],
+    "White": [1, 1, 1]
 }
 
 # Exponential backoff retry function
@@ -52,6 +53,20 @@ def add_merge(range, merge_type, sheetId):
                 "endColumnIndex": convert_range["endColumnIndex"]
             },
             "mergeType": merge_type
+        }
+    }
+
+def add_unmerge(range, sheetId):
+    convert_range = gspread.utils.a1_range_to_grid_range(range)
+    return {
+        "unmergeCells": {
+            "range": {
+                "sheetId": sheetId,
+                "startRowIndex": convert_range["startRowIndex"],
+                "endRowIndex": convert_range["endRowIndex"],
+                "startColumnIndex": convert_range["startColumnIndex"],
+                "endColumnIndex": convert_range["endColumnIndex"]
+            }
         }
     }
 
@@ -102,15 +117,35 @@ def generate_spreadsheet(name):
         raise Exception(e)
 
     # create worksheet later once testing is done
-    worksheet = sh.add_worksheet(title=name, rows=1000, cols=23)
+    # worksheet = sh.add_worksheet(title=name, rows=1000, cols=23)
+    worksheet = sh.worksheet(name)
 
     # worksheet = sh.worksheet(artist.artist_name)
     sheetId = worksheet._properties['sheetId']
 
+    # clearing edits made to worksheet by user_check_data
+    worksheet.clear()
+
+    unmerge = {
+        "requests": [add_unmerge(f"C2:F{len(artist.album_objects) + 2}", sheetId)]
+    }
+    sh.batch_update(unmerge)
+
+    # try:
+    #     # prints album titles for user to confirm
+    #     confirm_data(artist, worksheet, sheetId)
+    # except Exception as e:
+    #     # handle exception
+    #     raise Exception(e)
+
     worksheet.hide_gridlines()
 
-    # Format requests for Artist name, album rankings, song rankings, comments
+    # Format requests different cells
     formats = []
+    # Text to write to spreadsheet
+    text = []
+    # Keeping track of all merges
+    merges = []
 
     # Formatting all cells (essentially background)
     formats.append(add_format("A1:W1000", "bg", "Black", 10, False))
@@ -144,9 +179,6 @@ def generate_spreadsheet(name):
         }
     })
 
-    # Keeping track of all merges
-    merges = []
-
     # merging artist name header
     merges.append(add_merge("B2:O4", "MERGE_ALL", sheetId))
 
@@ -167,9 +199,6 @@ def generate_spreadsheet(name):
 
     # merging comments text
     merges.append(add_merge(f"Q{pos + 18}:V{pos + 33}", "MERGE_ALL", sheetId))
-
-    # Text to write to spreadsheet
-    text = []
 
     text.append(add_text("B2:O4", artist.artist_name))
 
@@ -252,15 +281,15 @@ def generate_spreadsheet(name):
     # Might have to call w/ exponential backoff if JSONDecodeError comes back
 
     worksheet.batch_format(formats)
-
     merge = {
         "requests": merges
     }
-
     sh.batch_update(merge)
-
     worksheet.batch_update(text)
 
+def delete_spreadsheet(name):
+    worksheet = sh.worksheet(name)
+    sh.del_worksheet(worksheet)
 # generate_spreadsheet("Dream Theater")
 # print("triggered batch_formatting_sheet script, not function")
 if __name__ == "__main__":
