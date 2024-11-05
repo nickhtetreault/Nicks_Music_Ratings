@@ -1,13 +1,11 @@
 from flask import Flask, request, jsonify
 import os
+from batch_formatting_sheet import *
+from user_check_data import confirm_data
+from artist_data import Artist
 
-# Your Python script (import this if it's in a different file)
-# import batch_formatting_sheet  # This should be the script that generates Google Spreadsheets
-from batch_formatting_sheet import generate_spreadsheet
 app = Flask(__name__)
 
-
-# This route listens for POST requests
 @app.route('/trigger', methods=['POST'])
 def trigger_script():
     try:
@@ -24,9 +22,16 @@ def trigger_script():
 
         if value == "":
             raise Exception("No artist provided")
-
-        print("I got here idk")
-        generate_spreadsheet(value)
+        elif value.lower() == "y":
+            # right now this has me generating same artist twice, I want to try and avoid this but not sure how atm
+            generate_spreadsheet(sheet_name)
+        elif value.lower() == "n":
+            delete_spreadsheet(sheet_name)
+            raise Exception("Data not confirmed")
+            # handle this case later in more detail
+        else:
+            # checking data if artist name provided
+            confirm_data(value)
 
         # Respond back to the sender
         return jsonify({"status": "Script executed successfully"}), 200
@@ -36,6 +41,5 @@ def trigger_script():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
-    # Run the Flask app on a specific port (5000 by default)
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
