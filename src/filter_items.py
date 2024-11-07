@@ -76,15 +76,35 @@ def check_bad(title):
         "lost not forgotten archives"
     ]
     for b in bad:
-        if (b in title.lower()):
+        if b in title.lower():
             return True
     return False
 
+def check_bad_song(title):
+    bad = [
+        "(live)",
+        " live",
+        "(cover)",
+        " cover",
+        "-instrumental",
+        "(instrumental)",
+        " instrumental",
+        "(demo)",
+        " demo",
+        "(acoustic)",
+        " acoustic",
+    ]
+    for b in bad:
+        if b in title.lower():
+            return True
+    return False
 
 def clean_alb_title(title, release):
     remove = [
         f"({release} remaster)",
         f"{release} remaster",
+        "(re-issue",
+        "(reissue",
         "(extended edition)",
         "- extended edition",
         "extended edition",
@@ -98,16 +118,19 @@ def clean_alb_title(title, release):
         "deluxe",
         "- reloaded",
         "(reloaded)",
-        "reloaded"
+        "reloaded",
+        "(bonus",
+        "bonus"
     ]
     for r in remove:
         pos = title.lower().find(r)
-        if (pos > -1):
+        if pos > -1:
             return title[0:pos].strip()
     return title
 
 def clean_song_title(title):
     remove = [
+        " - ",
         "(remastered)",
         "(remaster)",
         "(special edition)",
@@ -123,6 +146,6 @@ def clean_song_title(title):
     ]
     for r in remove:
         pos = title.lower().find(r)
-        if (pos > -1):
+        if pos > -1:
             return title[:pos].strip()
     return title

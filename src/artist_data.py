@@ -144,18 +144,13 @@ class Album:
         album_len = 0
         # Assigning data for each song on the album
         for s in song_data["items"]:
-            if " live" in s["name"].lower() or "(live)" in s["name"].lower():
-                continue
-            elif "cover" in s["name"].lower():
-                continue
-            elif " demo" in s["name"].lower() or "(demo)" in s["name"].lower():
-                continue
-            song = clean_song_title(s["name"])
-            song_titles.append(song)
-            song_ids.append(s["id"])
-            song_lens.append(self.millis_to_mins(s["duration_ms"]))
-            # Keeping track of overall length of album to convert to hr:min:sec later
-            album_len += s["duration_ms"]
+            if not check_bad_song(s["name"]):
+                song = clean_song_title(s["name"])
+                song_titles.append(song)
+                song_ids.append(s["id"])
+                song_lens.append(self.millis_to_mins(s["duration_ms"]))
+                # Keeping track of overall length of album to convert to hr:min:sec later
+                album_len += s["duration_ms"]
 
         self.song_titles = song_titles
         self.song_ids = song_ids
@@ -191,7 +186,7 @@ class Album:
 
 # num_albs = len(artist.album_objects)
 
-# artist = Artist("Dream Theater")
+# artist = Artist("Haken")
 
 # for i, alb in enumerate(artist.album_objects):
 #     print(f"{i + 1} {alb.album_title} {alb.release_date} {alb.album_len}")
