@@ -131,13 +131,6 @@ def generate_spreadsheet(name):
     }
     sh.batch_update(unmerge)
 
-    # try:
-    #     # prints album titles for user to confirm
-    #     confirm_data(artist, worksheet, sheetId)
-    # except Exception as e:
-    #     # handle exception
-    #     raise Exception(e)
-
     worksheet.hide_gridlines()
 
     # Format requests different cells
@@ -290,8 +283,20 @@ def generate_spreadsheet(name):
 def delete_spreadsheet(name):
     worksheet = sh.worksheet(name)
     sh.del_worksheet(worksheet)
-# generate_spreadsheet("Dream Theater")
-# print("triggered batch_formatting_sheet script, not function")
+
+def linkArtistSheet(sheet_name, cell, value, target_id):
+    base_link = "https://docs.google.com/spreadsheets/d/1Jc7roe2tmtVx-0hdn6DPI2zDh6NcPyWLBMVZN20a5WM/edit?gid="
+    full_link = f"{base_link}{target_id}#gid={target_id}"
+    worksheet = sh.worksheet(sheet_name)
+    worksheet.update_acell(cell, f'=HYPERLINK("{full_link}", "{value}")')
+
+    # want to reformat to look like plain text but this breaks hyperlink
+    # reformat = [add_format(cell, "bg", "Black", 10, False)]
+    # worksheet.batch_format(reformat)
+
 if __name__ == "__main__":
     print("triggered batch_formatting_sheet script, not function")
+
+# generate_spreadsheet("Dream Theater")
+# print("triggered batch_formatting_sheet script, not function")
 # generate_spreadsheet("The Dillinger Escape Plan")

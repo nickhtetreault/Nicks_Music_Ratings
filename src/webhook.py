@@ -16,9 +16,10 @@ def trigger_script():
         sheet_name = data.get('sheetName')
         cell = data.get('cell')
         value = data.get('value')
+        gid = data.get('id')
 
         # Log the received data
-        print(f"Received data: Sheet: {sheet_name}, Cell: {cell}, Value: {value}")
+        print(f"Received data: Sheet: {sheet_name}, Cell: {cell}, Value: {value}, ID: {gid}")
 
         if value == "":
             raise Exception("No artist provided")
@@ -31,7 +32,9 @@ def trigger_script():
             # handle this case later in more detail
         else:
             # checking data if artist name provided
-            confirm_data(value)
+            target_id = confirm_data(value)
+            linkArtistSheet(sheet_name, cell, value, target_id)
+            
 
         # Respond back to the sender
         return jsonify({"status": "Script executed successfully"}), 200

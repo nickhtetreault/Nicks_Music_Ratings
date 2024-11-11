@@ -47,3 +47,4 @@ def confirm_data(artist_name):
     }
     sh.batch_update(merge)
     worksheet.batch_update(data)
+    return worksheet.id
