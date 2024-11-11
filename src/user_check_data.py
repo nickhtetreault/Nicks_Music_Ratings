@@ -20,7 +20,7 @@ def confirm_data(artist_name):
     except Exception as e:
         raise Exception(e)
     
-    worksheet = sh.add_worksheet(title=artist_name, rows=1000, cols=23)
+    worksheet = sh.add_worksheet(title=artist.artist_name, rows=1000, cols=23)
     sheetId = worksheet._properties['sheetId']
 
     data = []
@@ -47,4 +47,4 @@ def confirm_data(artist_name):
     }
     sh.batch_update(merge)
     worksheet.batch_update(data)
-    return worksheet.id
+    return worksheet.id, artist.artist_name

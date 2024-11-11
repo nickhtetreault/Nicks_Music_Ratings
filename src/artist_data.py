@@ -4,6 +4,7 @@ import base64
 from requests import post, get
 import json
 import re
+import difflib
 from filter_items import *
 from discogs_filter import *
 
@@ -31,12 +32,20 @@ def get_token():
 def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
 
+# computing similarity of names
+def compute_similarity(input_name, found_name):
+    diff = difflib.ndiff(input_name, found_name)
+    diff_count = 0
+    for line in diff:
+        if line.startswith("-"):
+            diff_count += 1
+    return 1 - (diff_count / len(input_name))
+
 # object containing all data to be put into spreadsheet
 # also has variables that will be updated by input in spreadsheet (soon™)
 class Artist:
     def __init__(self, artist_name):
         self.token = get_token()
-        self.artist_name = artist_name
 
         # structuring request & finding artist_id
         url = "https://api.spotify.com/v1/search"
@@ -46,15 +55,21 @@ class Artist:
         result = get(query_url, headers=headers)
         # parsing json content to make data easier to accest
         json_result = json.loads(result.content)["artists"]["items"]
+        similarity = compute_similarity(json_result[0]["name"], artist_name)
 
         # checking that artist with given name exists
         if len(json_result) == 0:
             raise Exception("No artist found with this name")
         
-        if (json_result[0]["name"] != artist_name):
+        # if (json_result[0]["name"].lower() != artist_name.lower()):
+        #     name = json_result[0]["name"]
+        #     raise Exception(f"Expected {artist_name} but found {name}")
+        
+        if (similarity < .75):
             name = json_result[0]["name"]
             raise Exception(f"Expected {artist_name} but found {name}")
         
+        self.artist_name = json_result[0]["name"]
         self.artist_id = json_result[0]["id"]
 
         self.get_albums()

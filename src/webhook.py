@@ -32,8 +32,8 @@ def trigger_script():
             # handle this case later in more detail
         else:
             # checking data if artist name provided
-            target_id = confirm_data(value)
-            linkArtistSheet(sheet_name, cell, value, target_id)
+            target_id, correct_name = confirm_data(value)
+            linkArtistSheet(sheet_name, cell, correct_name, target_id)
             
 
         # Respond back to the sender
