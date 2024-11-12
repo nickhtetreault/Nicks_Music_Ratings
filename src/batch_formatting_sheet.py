@@ -242,6 +242,9 @@ def generate_spreadsheet(name):
         # Song titles
         merges.append(add_merge(f"F{album_pos + 2}:I{album_pos + len(alb.song_titles) + 2}", "MERGE_ROWS", sheetId))
 
+        # album cover
+        merges.append(add_merge(f"C{album_pos + 3}:D{album_pos + 7}", "MERGE_ALL", sheetId))
+
         # Format requests
         formats.append(add_format(f"C{album_pos}:C{album_pos + 1}", "Gray_1", "Purple_1", 25, True))
         formats.append(add_format(f"D{album_pos}:D{album_pos + 1}", "Gray_2", "Blue", 25, True))
@@ -261,6 +264,9 @@ def generate_spreadsheet(name):
         text.append(add_text(f"F{album_pos + 2}", "Title"))
         text.append(add_text(f"J{album_pos + 2}", "Length"))
         text.append(add_text(f"K{album_pos + 2}", "Rating"))
+
+        # adding album cover
+        worksheet.update_acell(f"C{album_pos + 3}", f'=IMAGE("{alb.cover}", 1)')
 
         for j in range(len(alb.song_titles)):
             text.append(add_text(f"E{album_pos + 3 + j}", j + 1))
